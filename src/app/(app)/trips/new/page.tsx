@@ -62,10 +62,15 @@ export default function NewTripPage() {
 
   return (
     <main className="max-w-2xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-2">Plan a new trip</h1>
-      <p className="text-gray-500 text-sm mb-8">
-        Name it, set the dates, pick the destination. The crew will handle the rest.
-      </p>
+      <div className="bg-green-50 rounded-xl p-6 mb-8">
+        <h1 className="text-2xl font-bold text-green-900 mb-1">
+          Time to make it happen.
+        </h1>
+        <p className="text-green-700 text-sm">
+          Name the trip, set the dates, pick where you&apos;re headed. You can
+          invite the crew and argue about courses later.
+        </p>
+      </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
         {error && (
@@ -77,7 +82,7 @@ export default function NewTripPage() {
         {/* Trip name */}
         <div>
           <label htmlFor="name" className="block text-sm font-medium mb-1">
-            Trip name
+            What are we calling this one?
           </label>
           <input
             id="name"
@@ -123,7 +128,7 @@ export default function NewTripPage() {
         {/* Golfer count */}
         <div>
           <label htmlFor="golferCount" className="block text-sm font-medium mb-1">
-            How many golfers?
+            How deep is the crew?
           </label>
           <select
             id="golferCount"
@@ -142,7 +147,7 @@ export default function NewTripPage() {
         {/* Destination */}
         <div>
           <label htmlFor="anchorType" className="block text-sm font-medium mb-1">
-            Destination type
+            Where are we headed?
           </label>
           <select
             id="anchorType"
@@ -167,7 +172,7 @@ export default function NewTripPage() {
         {/* Budget */}
         <div>
           <label className="block text-sm font-medium mb-1">
-            Budget per round (optional)
+            Budget per round <span className="text-gray-400 font-normal">(optional &mdash; keeps everyone honest)</span>
           </label>
           <div className="grid grid-cols-2 gap-4">
             <input
@@ -194,7 +199,7 @@ export default function NewTripPage() {
           disabled={loading}
           className="w-full rounded-lg bg-green-700 px-4 py-3 text-sm font-bold text-white hover:bg-green-600 disabled:opacity-50 transition"
         >
-          {loading ? "Creating trip..." : "Let's go"}
+          {loading ? "Setting it up..." : "Lock it in"}
         </button>
       </form>
     </main>

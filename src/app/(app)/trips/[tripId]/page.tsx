@@ -63,14 +63,14 @@ export default async function TripDetailPage({
           className="rounded-lg border border-gray-200 p-4 text-center hover:border-green-600 hover:bg-green-50 transition"
         >
           <div className="font-bold text-sm">Vote Board</div>
-          <div className="text-xs text-gray-500">Pick your courses</div>
+          <div className="text-xs text-gray-500">Who&apos;s in?</div>
         </Link>
         <Link
           href={`/search`}
           className="rounded-lg border border-gray-200 p-4 text-center hover:border-green-600 hover:bg-green-50 transition"
         >
           <div className="font-bold text-sm">Find Courses</div>
-          <div className="text-xs text-gray-500">Discover options</div>
+          <div className="text-xs text-gray-500">Find the goods</div>
         </Link>
         <div className="rounded-lg border border-gray-200 p-4 text-center text-gray-400">
           <div className="font-bold text-sm">Itinerary</div>
@@ -84,10 +84,13 @@ export default async function TripDetailPage({
 
       {/* Activity feed placeholder */}
       <div>
-        <h2 className="font-bold text-lg mb-4">Activity</h2>
-        <div className="rounded border border-gray-200 p-8 text-center text-gray-400">
-          <p className="text-sm">
-            No activity yet. Invite your crew and start planning.
+        <h2 className="font-bold text-lg mb-4">What&apos;s happening</h2>
+        <div className="rounded-xl bg-green-50 border border-green-200 p-8 text-center">
+          <p className="text-green-900 font-medium mb-1">
+            Nothing yet. The trip&apos;s waiting on you.
+          </p>
+          <p className="text-green-700 text-sm">
+            Invite your crew, find some courses, and get the votes rolling.
           </p>
         </div>
       </div>
