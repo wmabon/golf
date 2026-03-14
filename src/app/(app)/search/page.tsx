@@ -1,0 +1,343 @@
+"use client";
+
+import { useState, useCallback } from "react";
+import Link from "next/link";
+
+type AccessType = "public" | "resort" | "semi_private" | "private";
+
+interface CourseResult {
+  id: string;
+  name: string;
+  city: string | null;
+  state: string | null;
+  accessType: string;
+  accessConfidence: string;
+  distanceMiles: number;
+  priceBandMin: string | null;
+  priceBandMax: string | null;
+  reasonsToPlay: string | null;
+  editorialScore: string | null;
+  communityAverageScore: string | null;
+  reviewCount: number | null;
+  valueLabel: string | null;
+}
+
+interface SearchResults {
+  courses: CourseResult[];
+  totalCount: number;
+  page: number;
+  pageSize: number;
+}
+
+const ACCESS_BADGES: Record<string, { label: string; className: string }> = {
+  public: { label: "Public", className: "bg-green-100 text-green-800" },
+  resort: { label: "Resort", className: "bg-blue-100 text-blue-800" },
+  semi_private: { label: "Semi-Private", className: "bg-yellow-100 text-yellow-800" },
+  private: { label: "Private", className: "bg-red-100 text-red-800" },
+  unknown: { label: "Unknown", className: "bg-gray-100 text-gray-800" },
+};
+
+export default function SearchPage() {
+  const [query, setQuery] = useState("");
+  const [radiusMiles, setRadiusMiles] = useState(50);
+  const [priceMin, setPriceMin] = useState("");
+  const [priceMax, setPriceMax] = useState("");
+  const [accessTypes, setAccessTypes] = useState<AccessType[]>([]);
+  const [sortBy, setSortBy] = useState<"distance" | "price" | "quality">("distance");
+
+  const [results, setResults] = useState<SearchResults | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const toggleAccessType = useCallback((type: AccessType) => {
+    setAccessTypes((prev) =>
+      prev.includes(type) ? prev.filter((t) => t !== type) : [...prev, type]
+    );
+  }, []);
+
+  const handleSearch = useCallback(async (page = 1) => {
+    if (!query.trim()) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      // Determine anchor type
+      const trimmed = query.trim();
+      let anchor: Record<string, unknown>;
+
+      if (/^[A-Za-z]{3}$/i.test(trimmed)) {
+        anchor = { type: "airport", value: trimmed.toUpperCase() };
+      } else {
+        anchor = { type: "city", value: trimmed };
+      }
+
+      const body: Record<string, unknown> = {
+        anchor,
+        radiusMiles,
+        sortBy,
+        page,
+        pageSize: 20,
+      };
+
+      if (accessTypes.length > 0) {
+        body.accessTypes = accessTypes;
+      }
+
+      if (priceMin || priceMax) {
+        const priceBand: Record<string, number> = {};
+        if (priceMin) priceBand.min = Number(priceMin);
+        if (priceMax) priceBand.max = Number(priceMax);
+        body.priceBand = priceBand;
+      }
+
+      const res = await fetch("/api/search/courses", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(body),
+      });
+
+      if (!res.ok) {
+        const data = await res.json();
+        throw new Error(data.error || "Search failed");
+      }
+
+      const data = await res.json();
+      setResults(data);
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "Search failed");
+      setResults(null);
+    } finally {
+      setLoading(false);
+    }
+  }, [query, radiusMiles, priceMin, priceMax, accessTypes, sortBy]);
+
+  const formatPrice = (min: string | null, max: string | null) => {
+    if (!min && !max) return "Price N/A";
+    if (min === max) return `$${Number(min).toFixed(0)}`;
+    return `$${Number(min).toFixed(0)} - $${Number(max).toFixed(0)}`;
+  };
+
+  return (
+    <main className="max-w-5xl mx-auto p-6">
+      <h1 className="text-2xl font-bold mb-6">Find Courses</h1>
+
+      {/* Search input */}
+      <div className="flex gap-3 mb-6">
+        <input
+          type="text"
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+          placeholder="Airport code (MCO) or city name (Scottsdale)"
+          className="flex-1 rounded border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+        />
+        <button
+          onClick={() => handleSearch()}
+          disabled={loading || !query.trim()}
+          className="rounded bg-blue-600 px-6 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+        >
+          {loading ? "Searching..." : "Search"}
+        </button>
+      </div>
+
+      {/* Filters */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 rounded border border-gray-200 bg-gray-50">
+        {/* Radius slider */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Radius: {radiusMiles} miles
+          </label>
+          <input
+            type="range"
+            min={10}
+            max={200}
+            step={5}
+            value={radiusMiles}
+            onChange={(e) => setRadiusMiles(Number(e.target.value))}
+            className="w-full"
+          />
+          <div className="flex justify-between text-xs text-gray-400">
+            <span>10 mi</span>
+            <span>200 mi</span>
+          </div>
+        </div>
+
+        {/* Price range */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Price Range
+          </label>
+          <div className="flex gap-2">
+            <input
+              type="number"
+              value={priceMin}
+              onChange={(e) => setPriceMin(e.target.value)}
+              placeholder="Min"
+              className="w-1/2 rounded border border-gray-300 px-2 py-1 text-sm"
+            />
+            <input
+              type="number"
+              value={priceMax}
+              onChange={(e) => setPriceMax(e.target.value)}
+              placeholder="Max"
+              className="w-1/2 rounded border border-gray-300 px-2 py-1 text-sm"
+            />
+          </div>
+        </div>
+
+        {/* Sort by */}
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-1">
+            Sort By
+          </label>
+          <select
+            value={sortBy}
+            onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+            className="w-full rounded border border-gray-300 px-2 py-1.5 text-sm"
+          >
+            <option value="distance">Distance</option>
+            <option value="price">Price</option>
+            <option value="quality">Quality</option>
+          </select>
+        </div>
+
+        {/* Access type checkboxes */}
+        <div className="md:col-span-3">
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Access Type
+          </label>
+          <div className="flex flex-wrap gap-3">
+            {(["public", "resort", "semi_private", "private"] as const).map(
+              (type) => (
+                <label key={type} className="flex items-center gap-1.5 text-sm">
+                  <input
+                    type="checkbox"
+                    checked={accessTypes.includes(type)}
+                    onChange={() => toggleAccessType(type)}
+                    className="rounded"
+                  />
+                  {ACCESS_BADGES[type].label}
+                </label>
+              )
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* Error */}
+      {error && (
+        <div className="rounded border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 mb-6">
+          {error}
+        </div>
+      )}
+
+      {/* Results */}
+      {results && (
+        <div>
+          <p className="text-sm text-gray-500 mb-4">
+            {results.totalCount} course{results.totalCount !== 1 ? "s" : ""} found
+          </p>
+
+          {results.courses.length === 0 ? (
+            <div className="rounded border border-gray-200 p-8 text-center text-gray-500">
+              <p className="text-lg mb-2">No courses found</p>
+              <p className="text-sm">
+                Try broadening your filters or searching a different location.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {results.courses.map((course) => {
+                const badge = ACCESS_BADGES[course.accessType] ?? ACCESS_BADGES.unknown;
+                return (
+                  <Link
+                    key={course.id}
+                    href={`/courses/${course.id}`}
+                    className="block rounded border border-gray-200 p-4 hover:border-blue-300 hover:shadow-sm transition-colors"
+                  >
+                    <div className="flex items-start justify-between">
+                      <div className="flex-1">
+                        <div className="flex items-center gap-2 mb-1">
+                          <h3 className="text-lg font-semibold">{course.name}</h3>
+                          <span className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${badge.className}`}>
+                            {badge.label}
+                          </span>
+                        </div>
+
+                        <p className="text-sm text-gray-500 mb-2">
+                          {[course.city, course.state].filter(Boolean).join(", ")}
+                          {course.distanceMiles != null && (
+                            <span className="ml-2 text-gray-400">
+                              {course.distanceMiles} mi away
+                            </span>
+                          )}
+                        </p>
+
+                        {course.reasonsToPlay && (
+                          <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                            {course.reasonsToPlay}
+                          </p>
+                        )}
+                      </div>
+
+                      <div className="text-right ml-4 shrink-0">
+                        <p className="text-lg font-semibold text-gray-800">
+                          {formatPrice(course.priceBandMin, course.priceBandMax)}
+                        </p>
+
+                        {/* Composite quality score (editorial) */}
+                        {course.editorialScore && (
+                          <p className="text-xs text-gray-500 mt-1">
+                            Quality: {Number(course.editorialScore).toFixed(1)}
+                          </p>
+                        )}
+
+                        {/* Community score - always separate per FR-17 */}
+                        {course.communityAverageScore && (
+                          <p className="text-xs text-gray-500">
+                            Community: {Number(course.communityAverageScore).toFixed(1)}
+                            {course.reviewCount ? ` (${course.reviewCount})` : ""}
+                          </p>
+                        )}
+
+                        {course.valueLabel && (
+                          <span className="inline-block mt-1 rounded bg-orange-100 px-1.5 py-0.5 text-xs text-orange-700">
+                            {course.valueLabel}
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                  </Link>
+                );
+              })}
+            </div>
+          )}
+
+          {/* Pagination */}
+          {results.totalCount > results.pageSize && (
+            <div className="flex justify-center gap-2 mt-6">
+              <button
+                onClick={() => handleSearch(results.page - 1)}
+                disabled={results.page <= 1}
+                className="rounded border border-gray-300 px-3 py-1 text-sm disabled:opacity-50"
+              >
+                Previous
+              </button>
+              <span className="px-3 py-1 text-sm text-gray-500">
+                Page {results.page} of {Math.ceil(results.totalCount / results.pageSize)}
+              </span>
+              <button
+                onClick={() => handleSearch(results.page + 1)}
+                disabled={results.page * results.pageSize >= results.totalCount}
+                className="rounded border border-gray-300 px-3 py-1 text-sm disabled:opacity-50"
+              >
+                Next
+              </button>
+            </div>
+          )}
+        </div>
+      )}
+    </main>
+  );
+}
