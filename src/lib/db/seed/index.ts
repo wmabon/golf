@@ -1,10 +1,12 @@
 import { seedAirports } from "./airports";
 import { seedCourses } from "./courses";
+import { seedUsers } from "./users";
 
 async function main() {
   console.log("Starting seed...\n");
 
   try {
+    await seedUsers();
     await seedAirports();
     await seedCourses();
 

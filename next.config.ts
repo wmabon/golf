@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  // Extend as needed
+  turbopack: {
+    root: __dirname,
+  },
 };
 
 export default nextConfig;

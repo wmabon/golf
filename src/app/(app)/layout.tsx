@@ -1,7 +1,17 @@
-export default function AppLayout({
+import { auth } from "@/lib/auth";
+import { Nav } from "@/components/ui/nav";
+
+export default async function AppLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <>{children}</>;
+  const session = await auth();
+
+  return (
+    <>
+      <Nav userName={session?.user?.name} />
+      {children}
+    </>
+  );
 }
