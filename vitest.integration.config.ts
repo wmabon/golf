@@ -1,14 +1,13 @@
 import { defineConfig } from "vitest/config";
-import react from "@vitejs/plugin-react";
 import path from "path";
 
 export default defineConfig({
-  plugins: [react()],
   test: {
-    environment: "jsdom",
-    include: ["tests/unit/**/*.test.{ts,tsx}"],
-    exclude: ["tests/integration/**"],
+    include: ["tests/integration/**/*.test.ts"],
     globals: true,
+    testTimeout: 60_000, // containers can be slow to start
+    hookTimeout: 60_000,
+    pool: "forks", // isolate tests that share DB state
   },
   resolve: {
     alias: {
