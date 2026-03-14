@@ -21,7 +21,7 @@ export default function ReportForm({ courseId }: { courseId: string }) {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (description.length < 10) {
-      setError("Please provide at least 10 characters of detail.");
+      setError("Give us at least 10 characters so we can help.");
       return;
     }
 
@@ -52,7 +52,7 @@ export default function ReportForm({ courseId }: { courseId: string }) {
   if (submitted) {
     return (
       <div className="rounded border border-green-200 bg-green-50 px-4 py-3 text-sm text-green-700">
-        Thank you for your report. Our team will review it.
+        Got it. Thanks for keeping us honest. We&apos;ll take a look.
       </div>
     );
   }
@@ -63,7 +63,7 @@ export default function ReportForm({ courseId }: { courseId: string }) {
         onClick={() => setIsOpen(true)}
         className="text-sm text-gray-500 hover:text-gray-700 underline"
       >
-        Report an issue with this listing
+        Something off? Let us know.
       </button>
     );
   }
@@ -72,7 +72,7 @@ export default function ReportForm({ courseId }: { courseId: string }) {
     <form onSubmit={handleSubmit} className="space-y-3">
       <div>
         <label className="block text-sm font-medium text-gray-700 mb-1">
-          Issue Type
+          What&apos;s wrong?
         </label>
         <select
           value={reportType}
@@ -94,7 +94,7 @@ export default function ReportForm({ courseId }: { courseId: string }) {
         <textarea
           value={description}
           onChange={(e) => setDescription(e.target.value)}
-          placeholder="Please describe the issue in detail (min 10 characters)..."
+          placeholder="Tell us what needs fixing..."
           rows={3}
           className="w-full rounded border border-gray-300 px-3 py-2 text-sm"
         />
@@ -110,7 +110,7 @@ export default function ReportForm({ courseId }: { courseId: string }) {
           disabled={submitting}
           className="rounded bg-red-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-red-700 disabled:opacity-50"
         >
-          {submitting ? "Submitting..." : "Submit Report"}
+          {submitting ? "Sending..." : "Send report"}
         </button>
         <button
           type="button"

@@ -59,7 +59,7 @@ export default function RegisterPage() {
         <div className="text-center">
           <h1 className="text-2xl font-bold">Create account</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Plan your next golf trip in minutes
+            Join the crew. Start planning your next trip.
           </p>
         </div>
 
@@ -80,7 +80,7 @@ export default function RegisterPage() {
               required
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
               autoComplete="name"
             />
           </div>
@@ -95,7 +95,7 @@ export default function RegisterPage() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
               autoComplete="email"
             />
           </div>
@@ -114,7 +114,7 @@ export default function RegisterPage() {
               minLength={8}
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
               autoComplete="new-password"
             />
             <p className="text-xs text-gray-400 mt-1">
@@ -125,15 +125,17 @@ export default function RegisterPage() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+            className="w-full rounded bg-green-700 px-4 py-2 text-sm font-medium text-white hover:bg-green-800 disabled:opacity-50"
           >
             {loading ? "Creating account..." : "Create account"}
           </button>
         </form>
 
+        <p className="text-center text-xs text-gray-400">You&apos;ll be able to vote on courses, place side bets, and settle up with one tap.</p>
+
         <p className="text-center text-sm text-gray-500">
           Already have an account?{" "}
-          <Link href="/login" className="text-blue-600 hover:underline">
+          <Link href="/login" className="text-green-700 hover:underline">
             Sign in
           </Link>
         </p>

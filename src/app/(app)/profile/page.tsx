@@ -24,9 +24,21 @@ export default async function ProfilePage() {
           <p className="text-lg">{session.user?.email}</p>
         </div>
 
-        <p className="text-sm text-gray-400 pt-4">
-          Profile editing and membership management coming in the next build.
-        </p>
+        <div className="grid grid-cols-3 gap-4 pt-4">
+          <div className="rounded-xl bg-green-50 p-4 text-center">
+            <p className="text-2xl font-bold text-green-900">0</p>
+            <p className="text-xs text-green-700">Trips</p>
+          </div>
+          <div className="rounded-xl bg-green-50 p-4 text-center">
+            <p className="text-2xl font-bold text-green-900">0</p>
+            <p className="text-xs text-green-700">Rounds</p>
+          </div>
+          <div className="rounded-xl bg-green-50 p-4 text-center">
+            <p className="text-2xl font-bold text-green-900">0</p>
+            <p className="text-xs text-green-700">Bets settled</p>
+          </div>
+        </div>
+        <p className="text-sm text-gray-400 pt-4">Editing and preferences are next. For now, here&apos;s what we&apos;ve got.</p>
       </div>
     </main>
   );

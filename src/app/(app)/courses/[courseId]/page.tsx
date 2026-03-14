@@ -39,7 +39,7 @@ interface CourseDetail {
 
 const ACCESS_BADGES: Record<string, { label: string; className: string }> = {
   public: { label: "Public", className: "bg-green-100 text-green-800" },
-  resort: { label: "Resort", className: "bg-blue-100 text-blue-800" },
+  resort: { label: "Resort", className: "bg-green-100 text-green-800" },
   semi_private: { label: "Semi-Private", className: "bg-yellow-100 text-yellow-800" },
   private: { label: "Private", className: "bg-red-100 text-red-800" },
   unknown: { label: "Unknown", className: "bg-gray-100 text-gray-800" },
@@ -89,7 +89,7 @@ export default async function CourseDetailPage({
     <main className="max-w-4xl mx-auto p-6">
       <Link
         href="/search"
-        className="text-sm text-blue-600 hover:text-blue-800 mb-4 inline-block"
+        className="text-sm text-green-700 hover:text-green-800 mb-4 inline-block"
       >
         &larr; Back to Search
       </Link>
@@ -113,14 +113,14 @@ export default async function CourseDetailPage({
           {/* Reasons to play */}
           {course.reasonsToPlay && (
             <section>
-              <h2 className="text-lg font-semibold mb-2">Why Play Here</h2>
+              <h2 className="text-lg font-semibold mb-2">What makes it worth the trip</h2>
               <p className="text-gray-700">{course.reasonsToPlay}</p>
             </section>
           )}
 
           {/* Booking rules */}
           <section>
-            <h2 className="text-lg font-semibold mb-3">Booking Information</h2>
+            <h2 className="text-lg font-semibold mb-3">How to book</h2>
             <div className="rounded border border-gray-200 divide-y divide-gray-100">
               <div className="px-4 py-2.5 flex justify-between">
                 <span className="text-sm text-gray-500">Price Range</span>
@@ -129,7 +129,7 @@ export default async function CourseDetailPage({
                 </span>
               </div>
               <div className="px-4 py-2.5 flex justify-between">
-                <span className="text-sm text-gray-500">Public Tee Times</span>
+                <span className="text-sm text-gray-500">Public access</span>
                 <span className="text-sm font-medium">
                   {course.publicTimesAvailable === true
                     ? "Available"
@@ -140,7 +140,7 @@ export default async function CourseDetailPage({
               </div>
               {course.bookingWindowRule && (
                 <div className="px-4 py-2.5 flex justify-between">
-                  <span className="text-sm text-gray-500">Lead Time</span>
+                  <span className="text-sm text-gray-500">Book ahead</span>
                   <span className="text-sm font-medium">
                     {course.bookingWindowRule}
                     {course.bookingWindowDays && ` (${course.bookingWindowDays} days)`}
@@ -159,7 +159,7 @@ export default async function CourseDetailPage({
               )}
               {course.maxPlayers && (
                 <div className="px-4 py-2.5 flex justify-between">
-                  <span className="text-sm text-gray-500">Max Group Size</span>
+                  <span className="text-sm text-gray-500">Max per tee time</span>
                   <span className="text-sm font-medium">{course.maxPlayers} players</span>
                 </div>
               )}
@@ -202,7 +202,7 @@ export default async function CourseDetailPage({
                       href={course.websiteUrl}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-blue-600 hover:underline"
+                      className="text-green-700 hover:underline"
                     >
                       {course.websiteUrl}
                     </a>
@@ -215,7 +215,7 @@ export default async function CourseDetailPage({
 
           {/* Report issue */}
           <section>
-            <h2 className="text-lg font-semibold mb-3">Report an Issue</h2>
+            <h2 className="text-lg font-semibold mb-3">See something off?</h2>
             <ReportForm courseId={course.id} />
           </section>
         </div>
@@ -260,7 +260,7 @@ export default async function CourseDetailPage({
                 )}
               </div>
             ) : (
-              <p className="text-sm text-gray-400">No quality data yet</p>
+              <p className="text-sm text-gray-400">We&apos;re still scouting this one.</p>
             )}
           </div>
 
@@ -284,7 +284,7 @@ export default async function CourseDetailPage({
                 )}
               </div>
             ) : (
-              <p className="text-sm text-gray-400">No community reviews yet</p>
+              <p className="text-sm text-gray-400">No reviews yet. Play it and be the first.</p>
             )}
           </div>
 

@@ -37,7 +37,7 @@ interface UserVote {
 }
 
 const TYPE_BADGES: Record<string, { label: string; className: string }> = {
-  destination: { label: "Destination", className: "bg-blue-100 text-blue-800" },
+  destination: { label: "Destination", className: "bg-green-100 text-green-800" },
   course: { label: "Course", className: "bg-green-100 text-green-800" },
   itinerary: { label: "Itinerary", className: "bg-purple-100 text-purple-800" },
 };
@@ -93,9 +93,9 @@ function DeadlineCountdown({ deadline }: { deadline: string }) {
       const minutes = Math.floor((diff % (1000 * 60 * 60)) / (1000 * 60));
       if (hours > 24) {
         const days = Math.floor(hours / 24);
-        setRemaining(`${days}d ${hours % 24}h remaining`);
+        setRemaining(`${days}d ${hours % 24}h remaining — lock your vote in`);
       } else {
-        setRemaining(`${hours}h ${minutes}m remaining`);
+        setRemaining(`${hours}h ${minutes}m remaining — lock your vote in`);
       }
     }
     update();
@@ -383,6 +383,7 @@ export default function VoteBoardPage() {
       {/* Header */}
       <div className="mb-6">
         <h1 className="text-2xl font-bold">{trip.name} - Vote Board</h1>
+        <p className="text-sm text-gray-500 mt-1">Where the crew weighs in.</p>
         <div className="flex items-center gap-4 mt-2">
           <span className="text-sm text-gray-500">
             Mode: <span className="font-medium capitalize">{trip.votingMode}</span>
@@ -400,7 +401,7 @@ export default function VoteBoardPage() {
             onClick={() => setError(null)}
             className="ml-2 text-red-900 underline"
           >
-            dismiss
+            Got it
           </button>
         </div>
       )}
@@ -409,7 +410,7 @@ export default function VoteBoardPage() {
       {isCaptain && (
         <div className="mb-6 rounded border border-gray-200 p-4 space-y-3">
           <h2 className="text-sm font-semibold text-gray-500 uppercase tracking-wide">
-            Captain Controls
+            Captain&apos;s call
           </h2>
           <div className="flex flex-wrap items-end gap-4">
             {/* Voting mode switcher */}
@@ -422,7 +423,7 @@ export default function VoteBoardPage() {
                     onClick={() => handleSwitchMode(mode)}
                     className={`rounded px-3 py-1 text-sm ${
                       trip.votingMode === mode
-                        ? "bg-blue-600 text-white"
+                        ? "bg-green-700 text-white"
                         : "border border-gray-300 text-gray-600 hover:bg-gray-50"
                     }`}
                   >
@@ -445,7 +446,7 @@ export default function VoteBoardPage() {
                 <button
                   onClick={handleSetDeadline}
                   disabled={settingDeadline || !deadlineInput}
-                  className="rounded bg-blue-600 px-3 py-1 text-sm text-white hover:bg-blue-700 disabled:opacity-50"
+                  className="rounded bg-green-700 px-3 py-1 text-sm text-white hover:bg-green-800 disabled:opacity-50"
                 >
                   Set
                 </button>
@@ -496,9 +497,9 @@ export default function VoteBoardPage() {
           <h2 className="text-lg font-semibold">Options</h2>
           <button
             onClick={() => setShowAddForm(!showAddForm)}
-            className="rounded bg-blue-600 px-3 py-1.5 text-sm font-medium text-white hover:bg-blue-700"
+            className="rounded bg-green-700 px-3 py-1.5 text-sm font-medium text-white hover:bg-green-800"
           >
-            {showAddForm ? "Cancel" : "Add Option"}
+            {showAddForm ? "Cancel" : "Throw one in"}
           </button>
         </div>
 
@@ -553,17 +554,17 @@ export default function VoteBoardPage() {
             <button
               type="submit"
               disabled={addingOption}
-              className="rounded bg-blue-600 px-4 py-1.5 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+              className="rounded bg-green-700 px-4 py-1.5 text-sm font-medium text-white hover:bg-green-800 disabled:opacity-50"
             >
-              {addingOption ? "Adding..." : "Add Option"}
+              {addingOption ? "Adding..." : "Throw one in"}
             </button>
           </form>
         )}
 
         {activeOptions.length === 0 && finalizedOptions.length === 0 && (
           <div className="rounded border border-gray-200 p-8 text-center text-gray-500">
-            <p className="text-lg mb-2">No options yet</p>
-            <p className="text-sm">Add an option to start the vote.</p>
+            <p className="text-lg mb-2">No options yet. Someone throw one out there.</p>
+            <p className="text-sm">What are we considering?</p>
           </div>
         )}
 
@@ -663,7 +664,7 @@ export default function VoteBoardPage() {
                   onClick={() => handleFinalize(option.id)}
                   className="mt-3 rounded border border-orange-300 bg-orange-50 px-3 py-1 text-sm font-medium text-orange-700 hover:bg-orange-100"
                 >
-                  Finalize This Option
+                  This is the one
                 </button>
               )}
             </div>
@@ -674,7 +675,7 @@ export default function VoteBoardPage() {
       {/* Eliminated Options */}
       {eliminatedOptions.length > 0 && (
         <div className="mb-6">
-          <h2 className="text-lg font-semibold text-gray-400 mb-3">Eliminated</h2>
+          <h2 className="text-lg font-semibold text-gray-400 mb-3">Out of the running</h2>
           {eliminatedOptions.map((option) => (
             <div
               key={option.id}

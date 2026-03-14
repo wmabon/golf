@@ -37,7 +37,7 @@ function LoginForm() {
     setLoading(false);
 
     if (result?.error) {
-      setError("Invalid email or password");
+      setError("That didn't match. Check your email and password.");
     } else {
       router.push(callbackUrl);
     }
@@ -49,7 +49,7 @@ function LoginForm() {
         <div className="text-center">
           <h1 className="text-2xl font-bold">Sign in</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Welcome back to Golf Trip
+            Get back in the game.
           </p>
         </div>
 
@@ -70,7 +70,7 @@ function LoginForm() {
               required
               value={email}
               onChange={(e) => setEmail(e.target.value)}
-              className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
               autoComplete="email"
             />
           </div>
@@ -88,7 +88,7 @@ function LoginForm() {
               required
               value={password}
               onChange={(e) => setPassword(e.target.value)}
-              className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full rounded border border-gray-300 px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-green-600"
               autoComplete="current-password"
             />
           </div>
@@ -96,7 +96,7 @@ function LoginForm() {
           <button
             type="submit"
             disabled={loading}
-            className="w-full rounded bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+            className="w-full rounded bg-green-700 px-4 py-2 text-sm font-medium text-white hover:bg-green-800 disabled:opacity-50"
           >
             {loading ? "Signing in..." : "Sign in"}
           </button>
@@ -104,7 +104,7 @@ function LoginForm() {
 
         <p className="text-center text-sm text-gray-500">
           Don&apos;t have an account?{" "}
-          <Link href="/register" className="text-blue-600 hover:underline">
+          <Link href="/register" className="text-green-700 hover:underline">
             Sign up
           </Link>
         </p>
