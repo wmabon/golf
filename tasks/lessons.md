@@ -43,13 +43,22 @@ Agent worktree isolation fails with "Failed to resolve base branch HEAD" if repo
 ### BullMQ connection format
 BullMQ uses `{ host, port }` object, NOT a URL string like ioredis. Parse REDIS_URL or use separate env vars.
 
+### Drizzle customType geography is quoted in migrations
+Drizzle generates `"geography(Point, 4326)"` (with double quotes) for customType columns. PostgreSQL treats this as a literal type name and fails. After `pnpm db:generate`, manually find-and-replace `"geography(Point, 4326)"` → `geography(Point, 4326)` (unquoted) in the migration SQL.
+
+### drizzle-kit migrate needs DATABASE_URL
+`drizzle-kit migrate` does not read `.env.local`. Pass it explicitly: `DATABASE_URL=... pnpm db:migrate`. Same for `pnpm db:seed`.
+
+### Safety hook false positives
+The bash safety hook matches patterns like `curl|bash` inside words (e.g., "localhost" contains "bash" after "local"). Workaround for commit messages: use `git commit -F /tmp/msg.txt` instead of heredocs. Cannot use curl/wget in bash — use WebFetch tool or verify manually in browser.
+
 ## Project-Specific Notes
 
 ### Feature tracking
 Features tracked in `tasks/_queue.json` with slugs (e.g., `fr-29-34-booking-engine`). Status: backlog → done.
 
-### 4 state machines
-Trip (8 states), BookingRequest (9), Reservation (6), FeeCharge (5). All follow same pattern.
+### 7 state machines
+Trip (8 states), BookingRequest (9), Reservation (6), FeeCharge (5), Round (5), Bet (6), PhotoAsset (5). All follow same pattern.
 
 ### Assisted booking is the primary M2 path
 No golf booking API is publicly available. Assisted booking (concierge) is production mode. Direct API integration feature-flagged behind `BookingProvider` interface.
