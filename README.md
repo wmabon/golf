@@ -7,12 +7,12 @@ A web app that helps 2-8 golfers plan, book, optimize, play, and memorialize U.S
 | Milestone | Description | Status |
 |-----------|-------------|--------|
 | **M1** | Planning core: accounts, trips, discovery, quality, voting | Complete |
-| **M2** | Booking core: booking engine, fee billing, concierge ops | In progress |
-| M3 | Optimization + itinerary: swap suggestions, shared itinerary, notifications | Planned |
+| **M2** | Booking core: booking engine, fee billing, concierge ops | Complete |
+| **M3** | Optimization + itinerary: swap suggestions, shared itinerary, notifications | Complete |
 | M4 | On-trip + recap: scoring, games, side bets, photos, microsites | Planned |
 | M5 | Travel add-ons: optional lodging and air | Planned |
 
-**Current:** 55 API routes, 452 tests (447 unit + 5 integration), 20 database tables, 4 state machines.
+**Current:** 76 API routes, 575 tests (570 unit + 5 integration), 24 database tables, 4 state machines.
 
 ## Tech Stack
 
