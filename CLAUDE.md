@@ -114,7 +114,7 @@ Test credentials (after seed):
 - Return patterns: `null` (not found), `{ error: string }` (business rule failure), entity (success)
 - Log state changes to `activityFeedEntries`
 
-### API Routes
+### API Routes (for client-side calls)
 - Files at `src/app/api/{resource}/route.ts`
 - Dynamic params: `{ params }: { params: Promise<{ id: string }> }`
 - Auth check first: `requireAuth()`, then permission: `isTripMember()` / `isCaptain()`
@@ -123,11 +123,17 @@ Test credentials (after seed):
 - Error responses: `errorResponse(message, status)`
 - **Type narrowing**: when checking `"error" in result`, cast with `result.error as string`
 
+### Server Components (pages)
+- **NEVER** fetch your own API routes from server components — the fetch won't carry the auth session cookie and will return 401
+- **ALWAYS** call services directly: `import * as courseService from "@/services/discovery/course.service"`
+- API routes are for client-side `fetch()` calls only (from `"use client"` components)
+- Server components have direct database access — no need to round-trip through HTTP
+
 ### State Machines
 - Files at `src/services/{domain}/state-machine.ts` (or `state-machines/{entity}-sm.ts`)
 - Pattern: `VALID_TRANSITIONS` record → `canTransition(from, to)` → `getNextStates(current)` → `validateTransition(from, to)`
 - All transitions logged to activity feed
-- Current state machines: Trip (8 states), BookingRequest (9), Reservation (6), FeeCharge (5)
+- Current state machines: Trip (8), BookingRequest (9), Reservation (6), FeeCharge (5), Round (5), Bet (6), PhotoAsset (5)
 
 ### Auth
 - `systemRole` embedded in JWT via auth.ts callbacks (id + systemRole)
@@ -150,6 +156,13 @@ Test credentials (after seed):
 - Pure constraint functions in `src/services/optimization/swap-constraints.ts`
 - Config constants: `SWAP_CONSTRAINTS` object (quality threshold 15%, cost ceiling $20, safety margin 48h, max 2/round, ±60 min window)
 - FR-36 (safe-swap-only): never cancel a reservation without a confirmed replacement — enforced in service layer, not state machine
+
+### UI Tone (Two-Mode Design)
+- **Mode 1 — Social Energy**: discovery, voting, scoring, bets, recaps, empty states. Witty, punchy copy. Green palette (#166534 / #15803d). Large type, bold cards.
+- **Mode 2 — Trust Posture**: booking, fees, consent, cancellation, payments. Plainspoken, exact amounts, no humor. Restrained palette.
+- Button labels have personality in Mode 1 ("Lock it in", "Throw one in") but describe the action in Mode 2 ("Confirm booking for $185")
+- Empty states motivate action ("No trips yet. Someone's gotta go first.") not describe absence ("No trips found.")
+- Full guide: `.claude/skills/ui-tone/SKILL.md`
 
 ### Testing
 - Unit tests: `tests/unit/*.test.ts` — vitest + jsdom, no DB

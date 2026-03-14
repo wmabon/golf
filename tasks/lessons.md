@@ -63,5 +63,8 @@ Trip (8 states), BookingRequest (9), Reservation (6), FeeCharge (5), Round (5), 
 ### Assisted booking is the primary M2 path
 No golf booking API is publicly available. Assisted booking (concierge) is production mode. Direct API integration feature-flagged behind `BookingProvider` interface.
 
+### Server components must not fetch own API routes
+Server components calling `fetch("http://localhost:3000/api/...")` fail because the fetch doesn't carry the auth session cookie → 401. Always import and call service functions directly in server components. API routes are for client-side `"use client"` components only.
+
 ### Commit discipline
 Commit at feature boundaries after build + tests pass. Use specific file staging, not `git add -A`.
