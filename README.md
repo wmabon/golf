@@ -12,7 +12,7 @@ A web app that helps 2-8 golfers plan, book, optimize, play, and memorialize U.S
 | **M4** | On-trip + recap: scoring, games, side bets, photos, microsites | Complete |
 | **M5** | Travel add-ons: optional lodging and air | Complete |
 
-**All milestones complete.** ~120 API routes, 904 tests (899 unit + 5 integration), ~40 database tables, 7 state machines.
+**All milestones complete.** 97 API routes, 933 tests (899 unit + 34 integration), 38 database tables, 7 state machines.
 
 ## Tech Stack
 
@@ -53,7 +53,7 @@ src/
     (app)/                # Authenticated app pages
   lib/
     db/
-      schema/             # 20 Drizzle schema files (tables + enums)
+      schema/             # 38 Drizzle schema files (tables + enums)
       postgis.ts          # Custom geography(Point, 4326) type
       spatial-helpers.ts  # PostGIS query helpers
       seed/               # 50 airports + 97 courses with real coordinates
