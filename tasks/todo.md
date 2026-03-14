@@ -95,8 +95,28 @@
 ## M2: Booking Core (May 28 — Jul 8, 6 weeks)
 FR-29 to FR-34, fees, payment. Booking orchestration, tee-time coordination, party splitting, booking room, hybrid execution, reservation management.
 
-## M3: Optimization + Itinerary (Jul 9 — Aug 12, 5 weeks)
-FR-35 to FR-40, travel add-ons. Continuous optimization, swap suggestions, rebooking, monitoring engine.
+## M3: Itinerary Service & API Routes (FR-47 to FR-50)
+- [x] `src/lib/validation/itinerary.ts` — createItineraryItemSchema, updateItineraryItemSchema
+- [x] `src/services/trip/itinerary.service.ts` — getCanonicalItinerary, createItem, updateItem, deleteItem
+- [x] `src/app/api/trips/[tripId]/itinerary/route.ts` — GET canonical itinerary
+- [x] `src/app/api/trips/[tripId]/itinerary/items/route.ts` — POST create item
+- [x] `src/app/api/trips/[tripId]/itinerary/items/[itemId]/route.ts` — PUT update, DELETE item
+- [x] `tests/unit/itinerary-validation.test.ts` — 33 tests for create/update schemas
+
+## M3: Optimization Service (FR-35 to FR-40)
+- [x] `src/types/index.ts` — SwapPolicy type added
+- [x] `src/services/optimization/swap-constraints.ts` — SWAP_CONSTRAINTS config + 5 pure validation functions
+- [x] `src/lib/validation/optimization.ts` — declineSwapSchema, updateSwapPolicySchema, updateFreezeDateSchema
+- [x] `src/services/optimization/swap-suggestion.service.ts` — 9 service functions (list, get, create, approve, decline, swapPolicy CRUD, freezeDate CRUD, rebookingTimeline)
+- [x] `src/app/api/trips/[tripId]/swap-suggestions/route.ts` — GET list suggestions
+- [x] `src/app/api/trips/[tripId]/swap-suggestions/[suggestionId]/route.ts` — GET single suggestion
+- [x] `src/app/api/trips/[tripId]/swap-suggestions/[suggestionId]/approve/route.ts` — POST approve (captain)
+- [x] `src/app/api/trips/[tripId]/swap-suggestions/[suggestionId]/decline/route.ts` — POST decline (captain)
+- [x] `src/app/api/trips/[tripId]/swap-policy/route.ts` — GET/PUT swap policy
+- [x] `src/app/api/trips/[tripId]/rebooking-timeline/route.ts` — GET timeline
+- [x] `src/app/api/trips/[tripId]/freeze-date/route.ts` — GET/PUT freeze date
+- [x] `tests/unit/swap-constraints.test.ts` — 24 tests for all pure constraint functions
+- [x] `tests/unit/optimization-validation.test.ts` — 22 tests for all validation schemas
 
 ## M4: On-Trip + Recap (Aug 13 — Sep 16, 5 weeks)
 Rounds, scoring, side bets, photos, consent/veto, recap microsite.

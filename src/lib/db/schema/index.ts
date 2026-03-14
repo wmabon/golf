@@ -103,3 +103,29 @@ export {
   externalBookingTypeEnum,
 } from "./external-bookings";
 export type { ExternalBooking, NewExternalBooking } from "./external-bookings";
+
+export {
+  reservationSwaps,
+  swapApprovalStateEnum,
+} from "./reservation-swaps";
+export type { ReservationSwap, NewReservationSwap } from "./reservation-swaps";
+
+export {
+  itineraryItems,
+  itineraryItemTypeEnum,
+  itineraryItemStatusEnum,
+  itineraryItemSourceEnum,
+} from "./itinerary-items";
+export type { ItineraryItem, NewItineraryItem } from "./itinerary-items";
+
+export { notifications } from "./notifications";
+export type { Notification, NewNotification } from "./notifications";
+
+export {
+  notificationPreferences,
+  notificationChannelEnum,
+} from "./notification-preferences";
+export type {
+  NotificationPreference,
+  NewNotificationPreference,
+} from "./notification-preferences";

@@ -111,3 +111,31 @@ export type BookingSource =
   | "external";
 
 export type ExternalBookingType = "golf" | "lodging" | "flight" | "other";
+
+export type SwapApprovalState =
+  | "suggested"
+  | "approved"
+  | "declined"
+  | "auto_approved"
+  | "expired";
+
+export type ItineraryItemType =
+  | "golf"
+  | "lodging"
+  | "flight"
+  | "dining"
+  | "transport"
+  | "note"
+  | "other";
+
+export type ItineraryItemStatus =
+  | "confirmed"
+  | "pending"
+  | "canceled"
+  | "completed";
+
+export type ItineraryItemSource = "platform" | "external" | "manual";
+
+export type SwapPolicy = "notify_only" | "captain_approval" | "auto_upgrade";
+
+export type NotificationChannel = "email" | "in_app" | "sms";

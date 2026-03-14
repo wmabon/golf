@@ -28,6 +28,11 @@ export const JobNames = {
   FEE_CAPTURE_THRESHOLD: "fee-capture-threshold",
   BILLING_AUDIT_LOG: "billing-audit-log",
 
+  // Optimization (M3)
+  AVAILABILITY_MONITOR: "availability-monitor",
+  SWAP_SUGGESTION_NOTIFY: "swap-suggestion-notify",
+  REBOOKING_EXECUTE: "rebooking-execute",
+
   // Notification
   DISPATCH_NOTIFICATION: "dispatch-notification",
 } as const;

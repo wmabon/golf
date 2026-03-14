@@ -78,7 +78,7 @@
       "service": "optimization",
       "milestone": "M3",
       "priority": "P0",
-      "status": "backlog",
+      "status": "done",
       "dependencies": ["fr-29-34-booking-engine"],
       "notes": "FR-38, FR-40 are P1. Swap constraints in Section 8.7.1. Background monitoring job."
     },
@@ -100,7 +100,7 @@
       "service": "trip-and-collaboration",
       "milestone": "M3",
       "priority": "P0",
-      "status": "backlog",
+      "status": "done",
       "dependencies": ["fr-29-34-booking-engine"],
       "notes": "FR-49, FR-50 are P1. Canonical day-by-day itinerary view."
     },
@@ -155,7 +155,7 @@
       "service": "notification",
       "milestone": "M3",
       "priority": "P0",
-      "status": "backlog",
+      "status": "done",
       "dependencies": ["fr-6-10-trip-creation"],
       "notes": "FR-73 is P1. Activity feed (FR-74) needed early in M1 for trip state logging. Email + SMS providers required."
     },
