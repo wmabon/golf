@@ -89,7 +89,7 @@
       "service": "travel-addon",
       "milestone": "M5",
       "priority": "P1",
-      "status": "backlog",
+      "status": "done",
       "dependencies": ["fr-47-50-itinerary"],
       "notes": "FR-44 is P0 (link-out + itinerary capture, belongs in M3). FR-46 is P2. Blocked by Open Decision #3."
     },

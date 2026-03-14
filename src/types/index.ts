@@ -189,3 +189,5 @@ export type ExpenseCategory =
 export type SplitMethod = "equal" | "custom" | "exclude";
 
 export type SettlementStatus = "pending" | "confirmed";
+
+export type TravelSource = "affiliate" | "partner" | "manual";

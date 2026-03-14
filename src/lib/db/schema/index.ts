@@ -179,3 +179,9 @@ export {
   settlementStatusEnum,
 } from "./settlement-actions";
 export type { SettlementAction, NewSettlementAction } from "./settlement-actions";
+
+export { lodgingOptions, travelSourceEnum } from "./lodging-options";
+export type { LodgingOption, NewLodgingOption } from "./lodging-options";
+
+export { flightOptions } from "./flight-options";
+export type { FlightOption, NewFlightOption } from "./flight-options";
