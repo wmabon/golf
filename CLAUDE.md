@@ -66,6 +66,27 @@
 - **Testing**: Vitest + React Testing Library (unit), testcontainers (integration)
 - **Local Dev**: Docker Compose (PG+PostGIS on 5432, Redis on 6379)
 
+## Local Development
+
+```bash
+docker compose up -d
+DATABASE_URL=postgresql://golf:golf_dev_password@localhost:5432/golf_dev pnpm db:migrate
+DATABASE_URL=postgresql://golf:golf_dev_password@localhost:5432/golf_dev npx tsx src/lib/db/seed/index.ts
+DATABASE_URL=postgresql://golf:golf_dev_password@localhost:5432/golf_dev AUTH_SECRET=dev-secret-for-testing pnpm dev
+```
+
+Test credentials (after seed):
+- `demo@golf.test` / `password123` (regular user)
+- `captain@golf.test` / `password123` (regular user)
+- `admin@golf.test` / `password123` (admin role)
+
+### Migration Gotchas
+- `drizzle-kit` does not read `.env.local` — always pass `DATABASE_URL=...` explicitly
+- After `pnpm db:generate`, manually edit the migration SQL:
+  1. Unquote geography type: replace `"geography(Point, 4326)"` with `geography(Point, 4326)`
+  2. Add `CREATE EXTENSION IF NOT EXISTS postgis;` before first CREATE TABLE
+  3. Add GIST indexes: `CREATE INDEX ... ON courses/airports USING GIST(location);`
+
 ## Project Conventions
 
 ### Schema (Drizzle ORM)

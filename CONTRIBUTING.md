@@ -14,10 +14,14 @@ cd golf
 pnpm install
 cp .env.example .env.local   # then set AUTH_SECRET to a random string
 docker compose up -d
-pnpm dev
+DATABASE_URL=postgresql://golf:golf_dev_password@localhost:5432/golf_dev pnpm db:migrate
+DATABASE_URL=postgresql://golf:golf_dev_password@localhost:5432/golf_dev npx tsx src/lib/db/seed/index.ts
+DATABASE_URL=postgresql://golf:golf_dev_password@localhost:5432/golf_dev AUTH_SECRET=dev-secret-for-testing pnpm dev
 ```
 
-Verify at http://localhost:3000.
+Verify at http://localhost:3000. Sign in with `demo@golf.test` / `password123`.
+
+**Note:** `drizzle-kit` does not read `.env.local` — always pass `DATABASE_URL` explicitly for `db:migrate` and `db:seed` commands.
 
 ## Development Workflow
 

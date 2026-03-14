@@ -880,3 +880,673 @@ Each element in the array:
   "page": 1,
   "pageSize": 20
 }
+```
+
+---
+
+## 13. Rounds & Scoring
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/api/trips/:tripId/rounds` | Trip member | List rounds for a trip |
+| POST | `/api/trips/:tripId/rounds` | Trip member | Create a new round |
+| GET | `/api/trips/:tripId/rounds/:roundId` | Trip member | Get round detail |
+| PUT | `/api/trips/:tripId/rounds/:roundId` | Trip member | Update a round |
+| POST | `/api/trips/:tripId/rounds/:roundId/finalize` | Captain only | Finalize a round |
+| GET | `/api/trips/:tripId/rounds/:roundId/scores` | Trip member | Get all scores for a round |
+| PUT | `/api/trips/:tripId/rounds/:roundId/scores` | Trip member | Batch upsert scores |
+| GET | `/api/trips/:tripId/rounds/:roundId/scores/discrepancies` | Trip member | Get score discrepancies |
+
+### POST /api/trips/:tripId/rounds
+
+**Request:**
+
+```json
+{
+  "courseId": "uuid",
+  "roundDate": "2026-05-16",
+  "format": "stroke_play"
+}
+```
+
+| Field | Type | Rules |
+|-------|------|-------|
+| courseId | uuid | required |
+| roundDate | string | required, `YYYY-MM-DD` |
+| format | string? | max 50 chars |
+
+**Response `201`:**
+
+```json
+{ "round": { "id": "uuid", "courseId": "uuid", "roundDate": "2026-05-16", "..." : "..." } }
+```
+
+### PUT /api/trips/:tripId/rounds/:roundId
+
+Same fields as create, all optional (partial update).
+
+### POST /api/trips/:tripId/rounds/:roundId/finalize
+
+Captain-only. No request body required. Locks the round so scores become read-only.
+
+**Response `200`:**
+
+```json
+{ "round": { "id": "uuid", "status": "finalized", "..." : "..." } }
+```
+
+### PUT /api/trips/:tripId/rounds/:roundId/scores
+
+Batch upsert hole-by-hole scores for a single player.
+
+**Request:**
+
+```json
+{
+  "playerId": "uuid",
+  "entries": [
+    { "holeNumber": 1, "strokes": 4, "netStrokes": 3 },
+    { "holeNumber": 2, "strokes": 5 }
+  ]
+}
+```
+
+| Field | Type | Rules |
+|-------|------|-------|
+| playerId | uuid | required |
+| entries | array | required, 1-18 items |
+| entries[].holeNumber | integer | required, 1-18 |
+| entries[].strokes | integer | required, >= 1 |
+| entries[].netStrokes | integer? | optional |
+
+**Response `200`:**
+
+```json
+{ "scores": [ { "holeNumber": 1, "strokes": 4, "netStrokes": 3 }, "..." ] }
+```
+
+### GET /api/trips/:tripId/rounds/:roundId/scores/discrepancies
+
+Returns holes where multiple scorers entered conflicting values for the same player.
+
+**Response `200`:**
+
+```json
+{ "scores": [ { "holeNumber": 7, "playerId": "uuid", "entries": [ "..." ] } ] }
+```
+
+---
+
+## 14. Games
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/api/trips/:tripId/rounds/:roundId/games` | Trip member | List games for a round |
+| POST | `/api/trips/:tripId/rounds/:roundId/games` | Trip member | Create a game |
+| GET | `/api/trips/:tripId/rounds/:roundId/games/:gameId` | Trip member | Get game detail |
+| PUT | `/api/trips/:tripId/rounds/:roundId/games/:gameId` | Trip member | Update a game |
+| GET | `/api/trips/:tripId/rounds/:roundId/games/:gameId/results` | Trip member | Calculate game results |
+
+### POST /api/trips/:tripId/rounds/:roundId/games
+
+**Request:**
+
+```json
+{
+  "format": "nassau",
+  "name": "Nassau - Front/Back/Overall",
+  "templateId": "uuid-or-null",
+  "teams": [
+    { "name": "Team A", "playerIds": ["uuid-1", "uuid-2"] },
+    { "name": "Team B", "playerIds": ["uuid-3", "uuid-4"] }
+  ],
+  "stakesPerPlayer": 20
+}
+```
+
+| Field | Type | Rules |
+|-------|------|-------|
+| format | enum | required, `stroke_play` \| `best_ball` \| `skins` \| `nassau` \| `custom` |
+| name | string? | max 255 chars |
+| templateId | uuid? | optional, reference a game template |
+| teams | array? | array of `{ name: string (max 100), playerIds: uuid[] (min 1) }` |
+| stakesPerPlayer | number? | >= 0 |
+
+**Response `201`:**
+
+```json
+{ "game": { "id": "uuid", "format": "nassau", "name": "Nassau - Front/Back/Overall", "..." : "..." } }
+```
+
+### GET /api/trips/:tripId/rounds/:roundId/games/:gameId/results
+
+Returns computed results (standings, payouts) based on current scores.
+
+**Response `200`:**
+
+```json
+{ "results": { "gameId": "uuid", "standings": [ "..." ], "payouts": [ "..." ] } }
+```
+
+---
+
+## 15. Bets & Settlement
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/api/trips/:tripId/rounds/:roundId/bets` | Trip member | List bets for a round |
+| POST | `/api/trips/:tripId/rounds/:roundId/bets` | Trip member | Create a side bet |
+| GET | `/api/trips/:tripId/rounds/:roundId/bets/:betId` | Trip member | Get bet detail |
+| POST | `/api/trips/:tripId/rounds/:roundId/bets/:betId/accept` | Trip member | Accept a bet |
+| POST | `/api/trips/:tripId/rounds/:roundId/bets/:betId/resolve` | Captain only | Resolve a bet |
+
+### POST /api/trips/:tripId/rounds/:roundId/bets
+
+**Request:**
+
+```json
+{
+  "name": "Closest to the pin #7",
+  "amount": 10,
+  "triggerDescription": "Closest tee shot to the pin on hole 7",
+  "participantIds": ["uuid-1", "uuid-2", "uuid-3"],
+  "roundId": "uuid-or-null"
+}
+```
+
+| Field | Type | Rules |
+|-------|------|-------|
+| name | string? | max 255 chars |
+| amount | number | required, >= 0 |
+| triggerDescription | string | required, 1-2000 chars |
+| participantIds | uuid[] | required, min 1 |
+| roundId | uuid? | defaults to `:roundId` from URL if omitted |
+
+**Response `201`:**
+
+```json
+{ "bet": { "id": "uuid", "amount": 10, "triggerDescription": "Closest tee shot to the pin on hole 7", "..." : "..." } }
+```
+
+### POST /api/trips/:tripId/rounds/:roundId/bets/:betId/accept
+
+No request body required. Marks the current user as having accepted the bet.
+
+**Response `200`:**
+
+```json
+{ "bet": { "id": "uuid", "status": "accepted", "..." : "..." } }
+```
+
+### POST /api/trips/:tripId/rounds/:roundId/bets/:betId/resolve
+
+Captain-only. Closes the bet with an outcome.
+
+**Request:**
+
+```json
+{ "outcome": "Jordan won -- closest at 4 feet 2 inches" }
+```
+
+| Field | Type | Rules |
+|-------|------|-------|
+| outcome | string | required, 1-2000 chars |
+
+**Response `200`:**
+
+```json
+{ "bet": { "id": "uuid", "status": "resolved", "outcome": "Jordan won -- closest at 4 feet 2 inches", "..." : "..." } }
+```
+
+---
+
+## 16. Photos & Tagging
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/api/trips/:tripId/photos?publishState=` | Trip member | List photos (optional filter) |
+| POST | `/api/trips/:tripId/photos` | Trip member | Create photo record |
+| POST | `/api/trips/:tripId/photos/upload-url` | Trip member | Get presigned upload URL |
+| GET | `/api/trips/:tripId/photos/:photoId` | Trip member | Get photo detail |
+| DELETE | `/api/trips/:tripId/photos/:photoId` | Uploader or Captain | Delete a photo |
+| POST | `/api/trips/:tripId/photos/:photoId/tags` | Trip member | Tag users in a photo |
+| POST | `/api/trips/:tripId/photos/:photoId/nominate` | Trip member | Nominate photo for publication |
+
+### POST /api/trips/:tripId/photos
+
+**Request:**
+
+```json
+{ "caption": "Sunset on the 18th green" }
+```
+
+| Field | Type | Rules |
+|-------|------|-------|
+| caption | string? | max 500 chars |
+
+**Response `201`:**
+
+```json
+{ "photo": { "id": "uuid", "caption": "Sunset on the 18th green", "..." : "..." } }
+```
+
+### POST /api/trips/:tripId/photos/upload-url
+
+No request body required. Returns a presigned URL for direct upload.
+
+**Response `200`:**
+
+```json
+{ "uploadUrl": "https://s3.amazonaws.com/...", "key": "photos/uuid.jpg" }
+```
+
+### POST /api/trips/:tripId/photos/:photoId/tags
+
+**Request:**
+
+```json
+{ "userIds": ["uuid-1", "uuid-2"] }
+```
+
+| Field | Type | Rules |
+|-------|------|-------|
+| userIds | uuid[] | required, min 1 |
+
+**Response `201`:**
+
+```json
+{ "tags": [ { "photoId": "uuid", "userId": "uuid-1" }, { "photoId": "uuid", "userId": "uuid-2" } ] }
+```
+
+### POST /api/trips/:tripId/photos/:photoId/nominate
+
+No request body required. Nominates the photo for inclusion in the microsite. Triggers consent requests for tagged users.
+
+**Response `200`:**
+
+```json
+{ "photo": { "id": "uuid", "publishState": "pending_consent", "..." : "..." } }
+```
+
+---
+
+## 17. Photo Consent
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/api/trips/:tripId/photos/:photoId/consent` | Trip member | Submit consent decision |
+| POST | `/api/trips/:tripId/photos/:photoId/takedown` | Trip member | Request takedown of published photo |
+| GET | `/api/trips/:tripId/photos/consent-queue` | Trip member | Get photos awaiting user's consent |
+| GET | `/api/trips/:tripId/photos/audit-log` | Trip member | Get consent audit log for the trip |
+
+### POST /api/trips/:tripId/photos/:photoId/consent
+
+**Request:**
+
+```json
+{ "decision": "approved" }
+```
+
+| Field | Type | Rules |
+|-------|------|-------|
+| decision | enum | required, `approved` \| `vetoed` |
+
+**Response `200`:**
+
+```json
+{ "consent": { "photoId": "uuid", "userId": "uuid", "decision": "approved", "..." : "..." } }
+```
+
+### POST /api/trips/:tripId/photos/:photoId/takedown
+
+No request body required. Tagged user can request takedown of an already-published photo.
+
+**Response `200`:**
+
+```json
+{ "photo": { "id": "uuid", "publishState": "taken_down", "..." : "..." } }
+```
+
+### GET /api/trips/:tripId/photos/consent-queue
+
+Returns photos where the current user has been tagged and has not yet submitted a consent decision.
+
+**Response `200`:**
+
+```json
+{ "queue": [ { "photoId": "uuid", "caption": "...", "nominatedBy": "uuid", "..." : "..." } ] }
+```
+
+### GET /api/trips/:tripId/photos/audit-log
+
+Returns the full consent audit trail for all photos in the trip.
+
+**Response `200`:**
+
+```json
+{ "log": [ { "photoId": "uuid", "userId": "uuid", "action": "approved", "timestamp": "2026-05-17T10:00:00Z" } ] }
+```
+
+---
+
+## 18. Microsites
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/api/trips/:tripId/microsite` | Trip member | Get microsite config |
+| PUT | `/api/trips/:tripId/microsite` | Captain only | Create or update microsite |
+| POST | `/api/trips/:tripId/microsite/publish` | Captain only | Publish the microsite |
+| PUT | `/api/trips/:tripId/microsite/visibility` | Captain only | Set visibility mode |
+| POST | `/api/trips/:tripId/microsite/unpublish` | Captain only | Unpublish the microsite |
+| GET | `/api/recaps/:slug` | None (public) | View a published microsite |
+
+### PUT /api/trips/:tripId/microsite
+
+**Request:**
+
+```json
+{
+  "selectedAssetIds": ["uuid-1", "uuid-2", "uuid-3"],
+  "content": { "headline": "Pinehurst 2026", "summary": "An unforgettable trip" }
+}
+```
+
+| Field | Type | Rules |
+|-------|------|-------|
+| selectedAssetIds | uuid[]? | photos to include |
+| content | Record<string, unknown>? | freeform microsite content |
+
+**Response `200`:**
+
+```json
+{ "microsite": { "tripId": "uuid", "selectedAssetIds": ["..."], "content": { "..." : "..." }, "..." : "..." } }
+```
+
+### POST /api/trips/:tripId/microsite/publish
+
+Captain-only. No request body required. Publishes the microsite at its generated slug.
+
+**Response `200`:**
+
+```json
+{ "microsite": { "tripId": "uuid", "slug": "pinehurst-2026-abc123", "status": "published", "..." : "..." } }
+```
+
+### PUT /api/trips/:tripId/microsite/visibility
+
+**Request:**
+
+```json
+{ "mode": "public" }
+```
+
+| Field | Type | Rules |
+|-------|------|-------|
+| mode | enum | required, `unlisted` \| `public` |
+
+**Response `200`:**
+
+```json
+{ "microsite": { "tripId": "uuid", "visibilityMode": "public", "..." : "..." } }
+```
+
+### POST /api/trips/:tripId/microsite/unpublish
+
+Captain-only. No request body required. Takes the microsite offline.
+
+**Response `200`:**
+
+```json
+{ "microsite": { "tripId": "uuid", "status": "unpublished", "..." : "..." } }
+```
+
+### GET /api/recaps/:slug
+
+Public route -- no authentication required. Returns the published microsite for the given slug. Returns `X-Robots-Tag: noindex, nofollow` header for unlisted microsites.
+
+**Response `200`:**
+
+```json
+{ "microsite": { "tripId": "uuid", "slug": "pinehurst-2026-abc123", "visibilityMode": "public", "content": { "..." : "..." }, "..." : "..." } }
+```
+
+---
+
+## 19. Trip Expenses & Cost Splitting
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/api/trips/:tripId/expenses` | Trip member | List all expenses |
+| POST | `/api/trips/:tripId/expenses` | Trip member | Create an expense |
+| PUT | `/api/trips/:tripId/expenses/:expenseId` | Creator or Captain | Update an expense |
+| DELETE | `/api/trips/:tripId/expenses/:expenseId` | Creator or Captain | Delete an expense |
+| GET | `/api/trips/:tripId/expenses/settlement` | Trip member | Calculate settlement balances |
+| GET | `/api/trips/:tripId/expenses/settlement/actions` | Trip member | List settlement actions |
+| POST | `/api/trips/:tripId/expenses/settlement/actions` | Trip member | Generate payment deep links |
+
+### POST /api/trips/:tripId/expenses
+
+**Request:**
+
+```json
+{
+  "description": "Group dinner at 195 American",
+  "amount": 480,
+  "category": "meal",
+  "splitMethod": "equal",
+  "customSplits": null,
+  "excludedUserIds": ["uuid-of-absent-golfer"]
+}
+```
+
+| Field | Type | Rules |
+|-------|------|-------|
+| description | string | required, 1-500 chars |
+| amount | number | required, >= 0 |
+| category | enum | required, `tee_time` \| `lodging` \| `meal` \| `transport` \| `other` |
+| splitMethod | enum | `equal` \| `custom` \| `exclude`, default `equal` |
+| customSplits | array? | array of `{ userId: uuid, amount: number (>= 0) }` |
+| excludedUserIds | uuid[]? | users excluded from the split |
+
+**Response `201`:**
+
+```json
+{ "expense": { "id": "uuid", "description": "Group dinner at 195 American", "amount": 480, "category": "meal", "..." : "..." } }
+```
+
+### PUT /api/trips/:tripId/expenses/:expenseId
+
+Same fields as create, all optional (partial update). Only the expense creator or the trip captain can update.
+
+### DELETE /api/trips/:tripId/expenses/:expenseId
+
+Only the expense creator or the trip captain can delete. Returns `{ "success": true }` on success.
+
+### GET /api/trips/:tripId/expenses/settlement
+
+Calculates who owes whom, based on all trip expenses and their split rules.
+
+**Response `200`:**
+
+```json
+{
+  "settlement": {
+    "balances": [
+      { "userId": "uuid-1", "netBalance": -120.50 },
+      { "userId": "uuid-2", "netBalance": 120.50 }
+    ],
+    "transfers": [
+      { "from": "uuid-2", "to": "uuid-1", "amount": 120.50 }
+    ]
+  }
+}
+```
+
+### POST /api/trips/:tripId/expenses/settlement/actions
+
+Generates payment deep links (e.g., Venmo, Zelle) for the calculated settlement transfers.
+
+**Response `201`:**
+
+```json
+{
+  "actions": [
+    { "from": "uuid-2", "to": "uuid-1", "amount": 120.50, "venmoLink": "https://venmo.com/...", "zelleLink": "..." }
+  ]
+}
+```
+
+---
+
+## 20. Travel Add-Ons (Lodging & Flights)
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| POST | `/api/trips/:tripId/lodging/search` | Trip member | Search lodging options |
+| GET | `/api/trips/:tripId/lodging/options` | Trip member | List saved lodging options |
+| POST | `/api/trips/:tripId/lodging/options` | Trip member | Save a lodging option |
+| POST | `/api/trips/:tripId/flights/search` | Trip member | Search flight options |
+| GET | `/api/trips/:tripId/flights/options` | Trip member | List saved flight options |
+| POST | `/api/trips/:tripId/flights/options` | Trip member | Save a flight option |
+
+### POST /api/trips/:tripId/lodging/search
+
+**Request:**
+
+```json
+{
+  "location": "Pinehurst, NC",
+  "checkIn": "2026-05-15",
+  "checkOut": "2026-05-18",
+  "guests": 4,
+  "budgetMax": 300
+}
+```
+
+| Field | Type | Rules |
+|-------|------|-------|
+| location | string? | max 255 chars |
+| checkIn | string | required, `YYYY-MM-DD` |
+| checkOut | string | required, `YYYY-MM-DD` |
+| guests | integer | required, >= 1 |
+| budgetMax | number? | >= 0 |
+
+**Response `200`:**
+
+```json
+{
+  "results": [
+    { "name": "Pinehurst Resort", "pricePerNight": 250, "totalPrice": 750, "linkUrl": "https://...", "..." : "..." }
+  ]
+}
+```
+
+### POST /api/trips/:tripId/lodging/options
+
+**Request:**
+
+```json
+{
+  "name": "Pinehurst Resort",
+  "location": {
+    "address": "1 Carolina Vista Dr",
+    "city": "Pinehurst",
+    "state": "NC",
+    "lat": 35.195,
+    "lng": -79.469
+  },
+  "checkIn": "2026-05-15",
+  "checkOut": "2026-05-18",
+  "guests": 4,
+  "pricePerNight": 250,
+  "totalPrice": 750,
+  "bedrooms": 2,
+  "linkUrl": "https://pinehurst.com/booking/123",
+  "thumbnailUrl": "https://pinehurst.com/images/room.jpg"
+}
+```
+
+| Field | Type | Rules |
+|-------|------|-------|
+| name | string | required, 1-255 chars |
+| location | object? | `{ address?, city?, state?, lat?, lng? }` |
+| checkIn | string | required, `YYYY-MM-DD` |
+| checkOut | string | required, `YYYY-MM-DD` |
+| guests | integer | required, >= 1 |
+| pricePerNight | number? | >= 0 |
+| totalPrice | number? | >= 0 |
+| bedrooms | integer? | >= 0 |
+| linkUrl | string | required, valid URL, max 500 chars |
+| thumbnailUrl | string? | valid URL, max 500 chars |
+
+**Response `201`:**
+
+```json
+{ "option": { "id": "uuid", "name": "Pinehurst Resort", "checkIn": "2026-05-15", "..." : "..." } }
+```
+
+### POST /api/trips/:tripId/flights/search
+
+**Request:**
+
+```json
+{
+  "departureAirport": "ATL",
+  "arrivalAirport": "RDU",
+  "departureDate": "2026-05-15",
+  "returnDate": "2026-05-18",
+  "passengers": 2
+}
+```
+
+| Field | Type | Rules |
+|-------|------|-------|
+| departureAirport | string | required, 2-10 chars |
+| arrivalAirport | string | required, 2-10 chars |
+| departureDate | string | required, `YYYY-MM-DD` |
+| returnDate | string? | `YYYY-MM-DD` |
+| passengers | integer | >= 1, default `1` |
+
+**Response `200`:**
+
+```json
+{
+  "results": [
+    { "airline": "Delta", "departureTime": "2026-05-15T08:00:00Z", "arrivalTime": "2026-05-15T10:15:00Z", "price": 189, "..." : "..." }
+  ]
+}
+```
+
+### POST /api/trips/:tripId/flights/options
+
+**Request:**
+
+```json
+{
+  "airline": "Delta",
+  "departureAirport": "ATL",
+  "arrivalAirport": "RDU",
+  "departureTime": "2026-05-15T08:00:00Z",
+  "arrivalTime": "2026-05-15T10:15:00Z",
+  "price": 189,
+  "passengers": 2,
+  "linkUrl": "https://delta.com/booking/abc"
+}
+```
+
+| Field | Type | Rules |
+|-------|------|-------|
+| airline | string? | max 100 chars |
+| departureAirport | string | required, 2-10 chars |
+| arrivalAirport | string | required, 2-10 chars |
+| departureTime | string | required, ISO 8601 datetime |
+| arrivalTime | string | required, ISO 8601 datetime |
+| price | number? | >= 0 |
+| passengers | integer | >= 1, default `1` |
+| linkUrl | string? | valid URL, max 500 chars |
+
+**Response `201`:**
+
+```json
+{ "option": { "id": "uuid", "airline": "Delta", "departureAirport": "ATL", "..." : "..." } }
+```
