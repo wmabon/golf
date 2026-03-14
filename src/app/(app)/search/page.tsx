@@ -31,8 +31,8 @@ interface SearchResults {
 
 const ACCESS_BADGES: Record<string, { label: string; className: string }> = {
   public: { label: "Public", className: "bg-green-100 text-green-800" },
-  resort: { label: "Resort", className: "bg-blue-100 text-blue-800" },
-  semi_private: { label: "Semi-Private", className: "bg-yellow-100 text-yellow-800" },
+  resort: { label: "Resort", className: "bg-emerald-100 text-emerald-800" },
+  semi_private: { label: "Semi-Private", className: "bg-amber-100 text-amber-800" },
   private: { label: "Private", className: "bg-red-100 text-red-800" },
   unknown: { label: "Unknown", className: "bg-gray-100 text-gray-800" },
 };
@@ -48,6 +48,7 @@ export default function SearchPage() {
   const [results, setResults] = useState<SearchResults | null>(null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [hasSearched, setHasSearched] = useState(false);
 
   const toggleAccessType = useCallback((type: AccessType) => {
     setAccessTypes((prev) =>
@@ -60,9 +61,9 @@ export default function SearchPage() {
 
     setLoading(true);
     setError(null);
+    setHasSearched(true);
 
     try {
-      // Determine anchor type
       const trimmed = query.trim();
       let anchor: Record<string, unknown>;
 
@@ -113,14 +114,19 @@ export default function SearchPage() {
   }, [query, radiusMiles, priceMin, priceMax, accessTypes, sortBy]);
 
   const formatPrice = (min: string | null, max: string | null) => {
-    if (!min && !max) return "Price N/A";
+    if (!min && !max) return "Price TBD";
     if (min === max) return `$${Number(min).toFixed(0)}`;
-    return `$${Number(min).toFixed(0)} - $${Number(max).toFixed(0)}`;
+    return `$${Number(min).toFixed(0)}\u2013$${Number(max).toFixed(0)}`;
   };
 
   return (
     <main className="max-w-5xl mx-auto p-6">
-      <h1 className="text-2xl font-bold mb-6">Find Courses</h1>
+      <div className="mb-6">
+        <h1 className="text-2xl font-bold">Where are we playing?</h1>
+        <p className="text-gray-500 text-sm">
+          Drop an airport code or city. We&apos;ll find what&apos;s worth your time.
+        </p>
+      </div>
 
       {/* Search input */}
       <div className="flex gap-3 mb-6">
@@ -129,24 +135,24 @@ export default function SearchPage() {
           value={query}
           onChange={(e) => setQuery(e.target.value)}
           onKeyDown={(e) => e.key === "Enter" && handleSearch()}
-          placeholder="Airport code (MCO) or city name (Scottsdale)"
-          className="flex-1 rounded border border-gray-300 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-blue-500"
+          placeholder="Try MCO, Scottsdale, or Myrtle Beach"
+          className="flex-1 rounded-lg border border-gray-300 px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-green-600 focus:border-green-600"
         />
         <button
           onClick={() => handleSearch()}
           disabled={loading || !query.trim()}
-          className="rounded bg-blue-600 px-6 py-2 text-sm font-medium text-white hover:bg-blue-700 disabled:opacity-50"
+          className="rounded-lg bg-green-700 px-6 py-2.5 text-sm font-bold text-white hover:bg-green-600 disabled:opacity-50 transition"
         >
-          {loading ? "Searching..." : "Search"}
+          {loading ? "Hunting..." : "Find courses"}
         </button>
       </div>
 
       {/* Filters */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 rounded border border-gray-200 bg-gray-50">
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 p-4 rounded-xl border border-gray-200 bg-gray-50">
         {/* Radius slider */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Radius: {radiusMiles} miles
+            How far will you drive? <span className="text-green-700 font-bold">{radiusMiles} mi</span>
           </label>
           <input
             type="range"
@@ -155,7 +161,7 @@ export default function SearchPage() {
             step={5}
             value={radiusMiles}
             onChange={(e) => setRadiusMiles(Number(e.target.value))}
-            className="w-full"
+            className="w-full accent-green-700"
           />
           <div className="flex justify-between text-xs text-gray-400">
             <span>10 mi</span>
@@ -166,22 +172,22 @@ export default function SearchPage() {
         {/* Price range */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Price Range
+            Budget per round
           </label>
           <div className="flex gap-2">
             <input
               type="number"
               value={priceMin}
               onChange={(e) => setPriceMin(e.target.value)}
-              placeholder="Min"
-              className="w-1/2 rounded border border-gray-300 px-2 py-1 text-sm"
+              placeholder="Min $"
+              className="w-1/2 rounded-lg border border-gray-300 px-2 py-1.5 text-sm focus:ring-2 focus:ring-green-600 focus:outline-none"
             />
             <input
               type="number"
               value={priceMax}
               onChange={(e) => setPriceMax(e.target.value)}
-              placeholder="Max"
-              className="w-1/2 rounded border border-gray-300 px-2 py-1 text-sm"
+              placeholder="Max $"
+              className="w-1/2 rounded-lg border border-gray-300 px-2 py-1.5 text-sm focus:ring-2 focus:ring-green-600 focus:outline-none"
             />
           </div>
         </div>
@@ -189,33 +195,33 @@ export default function SearchPage() {
         {/* Sort by */}
         <div>
           <label className="block text-sm font-medium text-gray-700 mb-1">
-            Sort By
+            Show me the best by
           </label>
           <select
             value={sortBy}
             onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-            className="w-full rounded border border-gray-300 px-2 py-1.5 text-sm"
+            className="w-full rounded-lg border border-gray-300 px-2 py-1.5 text-sm focus:ring-2 focus:ring-green-600 focus:outline-none"
           >
-            <option value="distance">Distance</option>
-            <option value="price">Price</option>
-            <option value="quality">Quality</option>
+            <option value="distance">Closest first</option>
+            <option value="price">Cheapest first</option>
+            <option value="quality">Highest rated</option>
           </select>
         </div>
 
         {/* Access type checkboxes */}
         <div className="md:col-span-3">
           <label className="block text-sm font-medium text-gray-700 mb-2">
-            Access Type
+            Show me
           </label>
           <div className="flex flex-wrap gap-3">
             {(["public", "resort", "semi_private", "private"] as const).map(
               (type) => (
-                <label key={type} className="flex items-center gap-1.5 text-sm">
+                <label key={type} className="flex items-center gap-1.5 text-sm cursor-pointer">
                   <input
                     type="checkbox"
                     checked={accessTypes.includes(type)}
                     onChange={() => toggleAccessType(type)}
-                    className="rounded"
+                    className="rounded accent-green-700"
                   />
                   {ACCESS_BADGES[type].label}
                 </label>
@@ -227,8 +233,21 @@ export default function SearchPage() {
 
       {/* Error */}
       {error && (
-        <div className="rounded border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 mb-6">
+        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700 mb-6">
           {error}
+        </div>
+      )}
+
+      {/* Pre-search empty state */}
+      {!hasSearched && !results && (
+        <div className="rounded-xl bg-green-50 border border-green-200 p-12 text-center">
+          <p className="text-xl font-bold text-green-900 mb-2">
+            97 courses loaded and waiting.
+          </p>
+          <p className="text-green-700 text-sm">
+            Type an airport code or city name above to see what&apos;s in range.
+            We&apos;ll filter out anything you can&apos;t actually play.
+          </p>
         </div>
       )}
 
@@ -236,31 +255,36 @@ export default function SearchPage() {
       {results && (
         <div>
           <p className="text-sm text-gray-500 mb-4">
-            {results.totalCount} course{results.totalCount !== 1 ? "s" : ""} found
+            {results.totalCount === 0
+              ? "Nothing matched."
+              : `${results.totalCount} course${results.totalCount !== 1 ? "s" : ""} in range.`}
           </p>
 
           {results.courses.length === 0 ? (
-            <div className="rounded border border-gray-200 p-8 text-center text-gray-500">
-              <p className="text-lg mb-2">No courses found</p>
-              <p className="text-sm">
-                Try broadening your filters or searching a different location.
+            <div className="rounded-xl bg-amber-50 border border-amber-200 p-8 text-center">
+              <p className="text-lg font-bold text-amber-900 mb-2">
+                Swing and a miss.
+              </p>
+              <p className="text-amber-700 text-sm">
+                Try a wider radius, loosen the budget, or search a different area.
+                The perfect course is out there.
               </p>
             </div>
           ) : (
-            <div className="space-y-4">
+            <div className="space-y-3">
               {results.courses.map((course) => {
                 const badge = ACCESS_BADGES[course.accessType] ?? ACCESS_BADGES.unknown;
                 return (
                   <Link
                     key={course.id}
                     href={`/courses/${course.id}`}
-                    className="block rounded border border-gray-200 p-4 hover:border-blue-300 hover:shadow-sm transition-colors"
+                    className="block rounded-xl border border-gray-200 p-5 hover:border-green-400 hover:shadow-md transition"
                   >
                     <div className="flex items-start justify-between">
                       <div className="flex-1">
                         <div className="flex items-center gap-2 mb-1">
-                          <h3 className="text-lg font-semibold">{course.name}</h3>
-                          <span className={`inline-block rounded px-2 py-0.5 text-xs font-medium ${badge.className}`}>
+                          <h3 className="text-lg font-bold">{course.name}</h3>
+                          <span className={`inline-block rounded-full px-2.5 py-0.5 text-xs font-medium ${badge.className}`}>
                             {badge.label}
                           </span>
                         </div>
@@ -269,40 +293,40 @@ export default function SearchPage() {
                           {[course.city, course.state].filter(Boolean).join(", ")}
                           {course.distanceMiles != null && (
                             <span className="ml-2 text-gray-400">
-                              {course.distanceMiles} mi away
+                              &middot; {course.distanceMiles} mi
                             </span>
                           )}
                         </p>
 
                         {course.reasonsToPlay && (
-                          <p className="text-sm text-gray-600 mb-2 line-clamp-2">
+                          <p className="text-sm text-gray-600 line-clamp-2">
                             {course.reasonsToPlay}
                           </p>
                         )}
                       </div>
 
                       <div className="text-right ml-4 shrink-0">
-                        <p className="text-lg font-semibold text-gray-800">
+                        <p className="text-lg font-bold text-gray-900">
                           {formatPrice(course.priceBandMin, course.priceBandMax)}
                         </p>
 
-                        {/* Composite quality score (editorial) */}
+                        {/* Composite quality score (editorial) — separate from community per FR-17 */}
                         {course.editorialScore && (
                           <p className="text-xs text-gray-500 mt-1">
-                            Quality: {Number(course.editorialScore).toFixed(1)}
+                            Editor: {Number(course.editorialScore).toFixed(1)}/5
                           </p>
                         )}
 
-                        {/* Community score - always separate per FR-17 */}
+                        {/* Community score — always separate per FR-17 */}
                         {course.communityAverageScore && (
                           <p className="text-xs text-gray-500">
-                            Community: {Number(course.communityAverageScore).toFixed(1)}
+                            Golfers: {Number(course.communityAverageScore).toFixed(1)}/5
                             {course.reviewCount ? ` (${course.reviewCount})` : ""}
                           </p>
                         )}
 
                         {course.valueLabel && (
-                          <span className="inline-block mt-1 rounded bg-orange-100 px-1.5 py-0.5 text-xs text-orange-700">
+                          <span className="inline-block mt-1.5 rounded-full bg-amber-100 px-2 py-0.5 text-xs font-medium text-amber-800">
                             {course.valueLabel}
                           </span>
                         )}
@@ -316,21 +340,21 @@ export default function SearchPage() {
 
           {/* Pagination */}
           {results.totalCount > results.pageSize && (
-            <div className="flex justify-center gap-2 mt-6">
+            <div className="flex justify-center gap-3 mt-8">
               <button
                 onClick={() => handleSearch(results.page - 1)}
                 disabled={results.page <= 1}
-                className="rounded border border-gray-300 px-3 py-1 text-sm disabled:opacity-50"
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium disabled:opacity-50 hover:bg-gray-50 transition"
               >
                 Previous
               </button>
-              <span className="px-3 py-1 text-sm text-gray-500">
+              <span className="px-3 py-2 text-sm text-gray-500">
                 Page {results.page} of {Math.ceil(results.totalCount / results.pageSize)}
               </span>
               <button
                 onClick={() => handleSearch(results.page + 1)}
                 disabled={results.page * results.pageSize >= results.totalCount}
-                className="rounded border border-gray-300 px-3 py-1 text-sm disabled:opacity-50"
+                className="rounded-lg border border-gray-300 px-4 py-2 text-sm font-medium disabled:opacity-50 hover:bg-gray-50 transition"
               >
                 Next
               </button>
