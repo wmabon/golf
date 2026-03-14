@@ -39,3 +39,5 @@ next-env.d.ts
 # IDEs
 .vscode/
 .idea/
+.claude/dev.sh
+.claude/launch.json
