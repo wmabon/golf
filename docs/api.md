@@ -619,3 +619,264 @@ All admin endpoints require the `concierge_ops` or `admin` role.
 | valueScore | number? | 0-5 |
 | valueLabel | string? | max 100 chars, nullable |
 | tripFitInputs | Record<string, number>? | nullable |
+
+---
+
+## 10. Optimization
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/api/trips/:tripId/swap-suggestions` | Trip member | List swap suggestions |
+| GET | `/api/trips/:tripId/swap-suggestions/:suggestionId` | Trip member | Get swap suggestion detail |
+| POST | `/api/trips/:tripId/swap-suggestions/:suggestionId/approve` | Captain only | Approve a swap suggestion |
+| POST | `/api/trips/:tripId/swap-suggestions/:suggestionId/decline` | Captain only | Decline a swap suggestion |
+| GET | `/api/trips/:tripId/swap-policy` | Trip member | Get swap policy |
+| PUT | `/api/trips/:tripId/swap-policy` | Captain only | Update swap policy |
+| GET | `/api/trips/:tripId/rebooking-timeline` | Trip member | Get rebooking timeline |
+| GET | `/api/trips/:tripId/freeze-date` | Trip member | Get freeze date |
+| PUT | `/api/trips/:tripId/freeze-date` | Captain only | Update freeze date |
+
+### POST /api/trips/:tripId/swap-suggestions/:suggestionId/approve
+
+Captain-only. No request body required. Returns the updated suggestion.
+
+**Response `200`:**
+
+```json
+{ "suggestion": { "id": "uuid", "status": "approved", "..." : "..." } }
+```
+
+### POST /api/trips/:tripId/swap-suggestions/:suggestionId/decline
+
+Captain-only. Optional decline reason.
+
+**Request:**
+
+```json
+{ "reason": "We prefer the original course" }
+```
+
+| Field | Type | Rules |
+|-------|------|-------|
+| reason | string? | max 1000 chars |
+
+**Response `200`:**
+
+```json
+{ "suggestion": { "id": "uuid", "status": "declined", "..." : "..." } }
+```
+
+### PUT /api/trips/:tripId/swap-policy
+
+Captain-only. Sets the trip's swap-suggestion handling policy.
+
+**Request:**
+
+```json
+{ "policy": "captain_approval" }
+```
+
+| Field | Type | Rules |
+|-------|------|-------|
+| policy | enum | `notify_only` \| `captain_approval` \| `auto_upgrade` |
+
+**Response `200`:**
+
+```json
+{ "policy": "captain_approval" }
+```
+
+### PUT /api/trips/:tripId/freeze-date
+
+Captain-only. Sets the date after which no more swaps are allowed.
+
+**Request:**
+
+```json
+{ "freezeDate": "2026-05-10" }
+```
+
+| Field | Type | Rules |
+|-------|------|-------|
+| freezeDate | string | required, `YYYY-MM-DD` |
+
+**Response `200`:**
+
+```json
+{ "freezeDate": "2026-05-10" }
+```
+
+---
+
+## 11. Itinerary
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/api/trips/:tripId/itinerary` | Trip member | Get canonical itinerary |
+| POST | `/api/trips/:tripId/itinerary/items` | Trip member | Create manual itinerary item |
+| PUT | `/api/trips/:tripId/itinerary/items/:itemId` | Trip member | Update itinerary item |
+| DELETE | `/api/trips/:tripId/itinerary/items/:itemId` | Trip member | Delete itinerary item |
+
+### GET /api/trips/:tripId/itinerary
+
+Returns the canonical day-by-day itinerary for the trip, assembled from confirmed bookings and manually added items.
+
+**Response `200`:**
+
+```json
+{
+  "itinerary": {
+    "tripId": "uuid",
+    "days": [
+      {
+        "date": "2026-05-15",
+        "items": [
+          {
+            "id": "uuid",
+            "itemType": "flight",
+            "title": "Arrive RDU",
+            "date": "2026-05-15",
+            "startTime": "2026-05-15T14:30:00Z",
+            "sortOrder": 0
+          },
+          {
+            "id": "uuid",
+            "itemType": "lodging",
+            "title": "Check in - Pinehurst Resort",
+            "date": "2026-05-15",
+            "startTime": "2026-05-15T16:00:00Z",
+            "confirmationNumber": "PH-99887",
+            "sortOrder": 1
+          }
+        ]
+      },
+      {
+        "date": "2026-05-16",
+        "items": [
+          {
+            "id": "uuid",
+            "itemType": "golf",
+            "title": "Pinehurst No. 2",
+            "date": "2026-05-16",
+            "startTime": "2026-05-16T08:30:00Z",
+            "cost": 350,
+            "sortOrder": 0
+          }
+        ]
+      }
+    ]
+  }
+}
+```
+
+### POST /api/trips/:tripId/itinerary/items
+
+**Request:**
+
+```json
+{
+  "itemType": "dining",
+  "title": "Group dinner at 195 American",
+  "date": "2026-05-16",
+  "startTime": "2026-05-16T19:00:00Z",
+  "endTime": "2026-05-16T21:00:00Z",
+  "location": { "address": "195 Main St, Pinehurst, NC" },
+  "confirmationNumber": "RES-4455",
+  "bookingContact": "Host desk",
+  "participants": ["uuid-1", "uuid-2"],
+  "contactNotes": "Ask for the patio",
+  "cost": 60,
+  "notes": "Prix fixe menu, BYOB",
+  "sortOrder": 2
+}
+```
+
+| Field | Type | Rules |
+|-------|------|-------|
+| itemType | enum | `golf` \| `lodging` \| `flight` \| `dining` \| `transport` \| `note` \| `other` |
+| title | string | required, 1-500 chars |
+| date | string | required, `YYYY-MM-DD` |
+| startTime | string? | ISO 8601 datetime |
+| endTime | string? | ISO 8601 datetime |
+| location | object? | `{ address?: string, lat?: number, lng?: number }` |
+| confirmationNumber | string? | max 255 chars |
+| bookingContact | string? | max 255 chars |
+| participants | uuid[]? | array of user IDs |
+| contactNotes | string? | max 2000 chars |
+| cost | number? | >= 0 |
+| notes | string? | max 5000 chars |
+| sortOrder | integer? | display order within the day |
+
+**Response `201`:**
+
+```json
+{ "item": { "id": "uuid", "itemType": "dining", "title": "Group dinner at 195 American", "..." : "..." } }
+```
+
+---
+
+## 12. Notifications
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/api/users/:userId/notifications?page=&pageSize=` | Self only | List notifications (paginated) |
+| PUT | `/api/users/:userId/notifications/read-all` | Self only | Mark all notifications as read |
+| GET | `/api/users/:userId/notifications/unread-count` | Self only | Get unread notification count |
+| PUT | `/api/users/:userId/notifications/:notificationId/read` | Self only | Mark single notification as read |
+| GET | `/api/users/:userId/notification-preferences` | Self only | Get notification preferences |
+| PUT | `/api/users/:userId/notification-preferences` | Self only | Update notification preferences |
+
+### PUT /api/users/:userId/notification-preferences
+
+**Request:**
+
+```json
+[
+  { "eventType": "invite", "channel": "email", "enabled": true },
+  { "eventType": "invite", "channel": "in_app", "enabled": true },
+  { "eventType": "swap_suggestion", "channel": "sms", "enabled": false },
+  { "eventType": "booking_confirmation", "channel": "email", "enabled": true }
+]
+```
+
+Each element in the array:
+
+| Field | Type | Rules |
+|-------|------|-------|
+| eventType | enum | `invite` \| `vote_deadline` \| `booking_window_open` \| `booking_confirmation` \| `swap_suggestion` \| `fee_event` \| `score_reminder` \| `photo_approval` \| `microsite_publish` \| `itinerary_change` |
+| channel | enum | `email` \| `in_app` \| `sms` |
+| enabled | boolean | required |
+
+**Response `200`:**
+
+```json
+{
+  "preferences": [
+    { "eventType": "invite", "channel": "email", "enabled": true },
+    { "eventType": "invite", "channel": "in_app", "enabled": true },
+    { "eventType": "swap_suggestion", "channel": "sms", "enabled": false }
+  ]
+}
+```
+
+### GET /api/users/:userId/notifications
+
+**Query params:** `page` (optional, >= 1, default `1`), `pageSize` (optional, 1-100, default `20`).
+
+**Response `200`:**
+
+```json
+{
+  "notifications": [
+    {
+      "id": "uuid",
+      "eventType": "booking_confirmation",
+      "title": "Tee time confirmed",
+      "body": "Pinehurst No. 2 on May 16 at 8:30 AM is confirmed.",
+      "readAt": null,
+      "createdAt": "2026-05-10T12:00:00Z"
+    }
+  ],
+  "page": 1,
+  "pageSize": 20
+}
