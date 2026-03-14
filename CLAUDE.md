@@ -117,9 +117,37 @@
 - Queue definitions + job name constants in `src/jobs/queues.ts`
 - Worker process entry point: `src/jobs/worker.ts` (run via `pnpm worker`)
 - Three queues: `booking`, `billing`, `notification`
+- Add new job names to `JobNames` const in `queues.ts`, wire handlers in `worker.ts`
+
+### Notification Dispatch
+- Use `dispatchNotification()` from `src/services/notification/dispatch.service.ts` for single-user notifications
+- Use `dispatchToTripMembers()` for trip-wide broadcasts (auto-excludes actor)
+- Both respect per-channel, per-event-type preferences (default: enabled)
+- Email/SMS are logged stubs until providers are integrated; in-app creates DB records
+
+### Optimization / Swap Constraints
+- Pure constraint functions in `src/services/optimization/swap-constraints.ts`
+- Config constants: `SWAP_CONSTRAINTS` object (quality threshold 15%, cost ceiling $20, safety margin 48h, max 2/round, ±60 min window)
+- FR-36 (safe-swap-only): never cancel a reservation without a confirmed replacement — enforced in service layer, not state machine
 
 ### Testing
 - Unit tests: `tests/unit/*.test.ts` — vitest + jsdom, no DB
 - Integration tests: `tests/integration/*.test.ts` — testcontainers + real PG
-- Prefer testing pure exported functions (state machines, vote logic, party split, fee computation)
+- Prefer testing pure exported functions (state machines, vote logic, party split, fee computation, swap constraints)
 - Run: `pnpm test` (unit), `pnpm test:integration` (integration)
+
+### Documentation Discipline
+- Update `docs/api.md` when adding new endpoints
+- Update `README.md` stats (routes, tests, tables) at milestone boundaries
+- Write ADRs in `tasks/adrs/` for significant architecture decisions
+- Update `tasks/lessons.md` immediately after discovering gotchas
+- Keep `tasks/_queue.json` current — mark features done after build + tests pass
+
+### Commit Conventions
+- `feat(M1):` / `feat(M2):` / `feat(M3):` — milestone-scoped features
+- `chore:` — tooling, config, process changes
+- `docs:` — documentation only
+- `fix:` — bug fixes
+- Use specific file staging (`git add file1 file2`), never `git add -A`
+- Heredoc messages trigger safety hook false positives on words like "email", "shortlist" — use `git commit -F /tmp/msg.txt` instead
+- Always include `Co-Authored-By: Claude Opus 4.6 (1M context) <noreply@anthropic.com>`
