@@ -118,6 +118,65 @@ FR-29 to FR-34, fees, payment. Booking orchestration, tee-time coordination, par
 - [x] `tests/unit/swap-constraints.test.ts` — 24 tests for all pure constraint functions
 - [x] `tests/unit/optimization-validation.test.ts` — 22 tests for all validation schemas
 
+## M4 Phase 3: Cost Splitting (FR-80-83) and Settlement Deep Links
+- [x] `src/lib/validation/expenses.ts` — createExpenseSchema, updateExpenseSchema
+- [x] `src/services/billing/expense.service.ts` — createExpense, listExpenses, getExpense, updateExpense, deleteExpense, calculateSettlement, calculateSettlementPure (pure)
+- [x] `src/services/billing/settlement.service.ts` — buildDeepLinkUrl (pure), generateDeepLinks, listSettlementActions, markSettled, confirmReceipt
+- [x] `src/app/api/trips/[tripId]/expenses/route.ts` — GET list, POST create (any trip member)
+- [x] `src/app/api/trips/[tripId]/expenses/[expenseId]/route.ts` — PUT update, DELETE remove (creator or captain)
+- [x] `src/app/api/trips/[tripId]/expenses/settlement/route.ts` — GET settlement summary
+- [x] `src/app/api/trips/[tripId]/expenses/settlement/actions/route.ts` — GET list actions, POST generate deep links
+- [x] `tests/unit/expense-settlement.test.ts` — 18 tests: settlement calc (equal/custom/exclude/multi/edge/fees) + deep link URLs
+- [ ] Run tests and verify they pass (requires bash permission)
+
+## M4 Phase 4: Photos, Consent, and Microsites (FR-57-62)
+- [x] `src/lib/validation/media.ts` — uploadPhotoSchema, tagPhotoSchema, consentSchema, updateMicrositeSchema, visibilitySchema
+- [x] `src/services/media/photo.service.ts` — uploadPhoto, listPhotos, getPhoto, deletePhoto, deletePhotoAsCaptain, getPresignedUploadUrl
+- [x] `src/services/media/tagging.service.ts` — tagUsers, removeTag
+- [x] `src/services/media/consent.service.ts` — nominateForPublication, submitConsent, requestTakedown, getConsentQueue, getAuditLog
+- [x] `src/services/media/microsite.service.ts` — getMicrosite, createOrUpdateMicrosite, publishMicrosite, setVisibility, unpublishMicrosite, getPublicMicrosite
+- [x] `src/app/api/trips/[tripId]/photos/route.ts` — GET list, POST upload
+- [x] `src/app/api/trips/[tripId]/photos/[photoId]/route.ts` — GET detail, DELETE remove
+- [x] `src/app/api/trips/[tripId]/photos/upload-url/route.ts` — POST get presigned URL
+- [x] `src/app/api/trips/[tripId]/photos/[photoId]/tags/route.ts` — POST tag users
+- [x] `src/app/api/trips/[tripId]/photos/[photoId]/tags/[userId]/route.ts` — DELETE remove tag
+- [x] `src/app/api/trips/[tripId]/photos/[photoId]/nominate/route.ts` — POST nominate for publication
+- [x] `src/app/api/trips/[tripId]/photos/[photoId]/consent/route.ts` — POST approve/veto
+- [x] `src/app/api/trips/[tripId]/photos/[photoId]/takedown/route.ts` — POST request takedown
+- [x] `src/app/api/trips/[tripId]/photos/consent-queue/route.ts` — GET pending consents
+- [x] `src/app/api/trips/[tripId]/photos/audit-log/route.ts` — GET audit trail
+- [x] `src/app/api/trips/[tripId]/microsite/route.ts` — GET config, PUT update content
+- [x] `src/app/api/trips/[tripId]/microsite/publish/route.ts` — POST publish
+- [x] `src/app/api/trips/[tripId]/microsite/visibility/route.ts` — PUT toggle visibility
+- [x] `src/app/api/trips/[tripId]/microsite/unpublish/route.ts` — POST unpublish
+- [x] `src/app/api/recaps/[slug]/route.ts` — GET public microsite (NO AUTH)
+- [x] `tests/unit/photo-asset-sm.test.ts` — all valid/invalid photo state transitions
+- [x] `tests/unit/media-validation.test.ts` — all five validation schemas
+- [x] `tests/unit/consent-logic.test.ts` — consent workflow: all approved, any vetoed, partial pending
+
+## M4 Phase 2: Rounds, Scoring, and Games (FR-51, FR-52, FR-55, FR-56)
+- [x] `src/lib/validation/rounds.ts` — createRoundSchema, updateRoundSchema, batchScoreSchema, createGameSchema, createBetSchema, resolveBetSchema
+- [x] `src/services/rounds/round.service.ts` — createRound, listRounds, getRound, updateRound, startRound, completeRound, finalizeRound
+- [x] `src/services/rounds/score.service.ts` — batchUpsertScores, getScores, getDiscrepancies
+- [x] `src/services/rounds/game.service.ts` — createGame, listGames, getGame, updateGame, calculateResults (stroke_play, best_ball, skins, nassau)
+- [x] `src/services/rounds/bet.service.ts` — createBet, listBets, getBet, acceptBet, declineBet, resolveBet, voidBet, getBetLedger
+- [x] `src/app/api/trips/[tripId]/rounds/route.ts` — GET list, POST create
+- [x] `src/app/api/trips/[tripId]/rounds/[roundId]/route.ts` — GET detail, PUT update
+- [x] `src/app/api/trips/[tripId]/rounds/[roundId]/finalize/route.ts` — POST (captain only)
+- [x] `src/app/api/trips/[tripId]/rounds/[roundId]/scores/route.ts` — PUT batch upsert, GET all scores
+- [x] `src/app/api/trips/[tripId]/rounds/[roundId]/scores/discrepancies/route.ts` — GET
+- [x] `src/app/api/trips/[tripId]/rounds/[roundId]/games/route.ts` — GET list, POST create
+- [x] `src/app/api/trips/[tripId]/rounds/[roundId]/games/[gameId]/route.ts` — GET detail, PUT update
+- [x] `src/app/api/trips/[tripId]/rounds/[roundId]/games/[gameId]/results/route.ts` — GET calculated results
+- [x] `src/app/api/trips/[tripId]/rounds/[roundId]/bets/route.ts` — GET list, POST create
+- [x] `src/app/api/trips/[tripId]/rounds/[roundId]/bets/[betId]/route.ts` — GET detail
+- [x] `src/app/api/trips/[tripId]/rounds/[roundId]/bets/[betId]/accept/route.ts` — POST accept
+- [x] `src/app/api/trips/[tripId]/rounds/[roundId]/bets/[betId]/resolve/route.ts` — POST resolve (captain only)
+- [x] `tests/unit/round-sm.test.ts` — round state machine transitions
+- [x] `tests/unit/bet-sm.test.ts` — bet state machine transitions
+- [x] `tests/unit/rounds-validation.test.ts` — all validation schemas
+- [x] `tests/unit/game-results.test.ts` — game result calculations (stroke_play, best_ball, skins, nassau)
+
 ## M4: On-Trip + Recap (Aug 13 — Sep 16, 5 weeks)
 Rounds, scoring, side bets, photos, consent/veto, recap microsite.
 

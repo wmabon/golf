@@ -23,7 +23,7 @@ export async function PUT(
     parsed.data.status
   );
 
-  if ("error" in result) return errorResponse(result.error, 400);
+  if ("error" in result) return errorResponse(result.error as string, 400);
 
   return NextResponse.json({ trip: result.trip });
 }

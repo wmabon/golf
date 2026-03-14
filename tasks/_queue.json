@@ -111,7 +111,7 @@
       "service": "rounds-games-betting",
       "milestone": "M4",
       "priority": "P0",
-      "status": "backlog",
+      "status": "done",
       "dependencies": ["fr-6-10-trip-creation"],
       "notes": "FR-55, FR-56 are P1. Game templates blocked by Open Decision #2. Mobile-first score entry."
     },
@@ -122,7 +122,7 @@
       "service": "media-and-microsite",
       "milestone": "M4",
       "priority": "P0",
-      "status": "backlog",
+      "status": "done",
       "dependencies": ["fr-6-10-trip-creation"],
       "notes": "FR-59, FR-61, FR-62 are P1. S3/CDN required. PhotoAsset state machine. Privacy-first."
     },
@@ -133,7 +133,7 @@
       "service": "rounds-games-betting",
       "milestone": "M4",
       "priority": "P0",
-      "status": "backlog",
+      "status": "done",
       "dependencies": ["fr-51-56-rounds-scoring"],
       "notes": "FR-63 is P0. FR-64, FR-65 are P1. FR-66 is P2 (badges post-launch)."
     },
@@ -177,7 +177,7 @@
       "service": "billing",
       "milestone": "M4",
       "priority": "P1",
-      "status": "backlog",
+      "status": "done",
       "dependencies": ["fr-67-71-fees-billing"],
       "notes": "All P1. Expense ledger + settlement deep links. Non-custodial. Should ship before GA."
     }
