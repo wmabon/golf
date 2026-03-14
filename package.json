@@ -1,0 +1,50 @@
+{
+  "name": "golf",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint src/",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:studio": "drizzle-kit studio",
+    "db:seed": "npx tsx src/lib/db/seed/index.ts",
+    "worker": "npx tsx src/jobs/worker.ts"
+  },
+  "packageManager": "pnpm@10.32.1",
+  "dependencies": {
+    "@tailwindcss/postcss": "^4.2.1",
+    "bcryptjs": "^3.0.3",
+    "bullmq": "^5.71.0",
+    "drizzle-orm": "^0.45.1",
+    "ioredis": "^5.10.0",
+    "nanoid": "^5.1.6",
+    "next": "^16.1.6",
+    "next-auth": "5.0.0-beta.30",
+    "postcss": "^8.5.8",
+    "postgres": "^3.4.8",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "stripe": "^20.4.1",
+    "tailwindcss": "^4.2.1",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@testing-library/react": "^16.3.2",
+    "@types/bcryptjs": "^3.0.0",
+    "@types/node": "^25.5.0",
+    "@types/react": "^19.2.14",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^6.0.1",
+    "drizzle-kit": "^0.31.9",
+    "eslint": "^10.0.3",
+    "jsdom": "^28.1.0",
+    "prettier": "^3.8.1",
+    "typescript": "^5.9.3",
+    "vitest": "^4.1.0"
+  }
+}
