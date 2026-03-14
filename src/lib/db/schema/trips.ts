@@ -11,6 +11,7 @@ import {
   index,
 } from "drizzle-orm/pg-core";
 import { users } from "./users";
+import { tripSeries } from "./trip-series";
 
 export const tripStatusEnum = pgEnum("trip_status", [
   "draft",
@@ -60,6 +61,7 @@ export const trips = pgTable(
     creatorId: uuid("creator_id")
       .notNull()
       .references(() => users.id),
+    seriesId: uuid("series_id").references(() => tripSeries.id),
     statusChangedAt: timestamp("status_changed_at", { withTimezone: true })
       .notNull()
       .defaultNow(),

@@ -129,3 +129,53 @@ export type {
   NotificationPreference,
   NewNotificationPreference,
 } from "./notification-preferences";
+
+export { tripSeries } from "./trip-series";
+export type { TripSeriesRow, NewTripSeries } from "./trip-series";
+
+export { rounds, roundStatusEnum } from "./rounds";
+export type { Round, NewRound } from "./rounds";
+
+export { scoreEntries } from "./score-entries";
+export type { ScoreEntry, NewScoreEntry } from "./score-entries";
+
+export { gameTemplates, gameFormatEnum } from "./game-templates";
+export type { GameTemplate, NewGameTemplate } from "./game-templates";
+
+export { games, gameStatusEnum } from "./games";
+export type { Game, NewGame } from "./games";
+
+export { bets, betStatusEnum } from "./bets";
+export type { Bet, NewBet } from "./bets";
+
+export { betParticipants, betParticipantStatusEnum } from "./bet-participants";
+export type { BetParticipant, NewBetParticipant } from "./bet-participants";
+
+export { photoAssets, publishStateEnum } from "./photo-assets";
+export type { PhotoAsset, NewPhotoAsset } from "./photo-assets";
+
+export { photoTags } from "./photo-tags";
+export type { PhotoTag, NewPhotoTag } from "./photo-tags";
+
+export { photoConsents, consentStateEnum } from "./photo-consents";
+export type { PhotoConsent, NewPhotoConsent } from "./photo-consents";
+
+export {
+  microsites,
+  micrositePublishStateEnum,
+  micrositeVisibilityEnum,
+} from "./microsites";
+export type { Microsite, NewMicrosite } from "./microsites";
+
+export {
+  tripExpenses,
+  expenseCategoryEnum,
+  splitMethodEnum,
+} from "./trip-expenses";
+export type { TripExpense, NewTripExpense } from "./trip-expenses";
+
+export {
+  settlementActions,
+  settlementStatusEnum,
+} from "./settlement-actions";
+export type { SettlementAction, NewSettlementAction } from "./settlement-actions";

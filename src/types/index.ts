@@ -139,3 +139,53 @@ export type ItineraryItemSource = "platform" | "external" | "manual";
 export type SwapPolicy = "notify_only" | "captain_approval" | "auto_upgrade";
 
 export type NotificationChannel = "email" | "in_app" | "sms";
+
+export type RoundStatus =
+  | "scheduled"
+  | "in_progress"
+  | "completed"
+  | "finalized"
+  | "canceled";
+
+export type GameFormat =
+  | "stroke_play"
+  | "best_ball"
+  | "skins"
+  | "nassau"
+  | "custom";
+
+export type GameStatus = "created" | "in_play" | "completed";
+
+export type BetStatus =
+  | "proposed"
+  | "accepted"
+  | "declined"
+  | "resolved"
+  | "voided"
+  | "expired";
+
+export type BetParticipantStatus = "pending" | "accepted" | "declined";
+
+export type PublishState =
+  | "private"
+  | "review_pending"
+  | "publish_eligible"
+  | "published"
+  | "withdrawn";
+
+export type ConsentState = "pending" | "approved" | "vetoed";
+
+export type MicrositePublishState = "draft" | "published" | "unpublished";
+
+export type MicrositeVisibility = "unlisted" | "public";
+
+export type ExpenseCategory =
+  | "tee_time"
+  | "lodging"
+  | "meal"
+  | "transport"
+  | "other";
+
+export type SplitMethod = "equal" | "custom" | "exclude";
+
+export type SettlementStatus = "pending" | "confirmed";
