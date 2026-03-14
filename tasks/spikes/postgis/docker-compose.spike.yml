@@ -1,0 +1,28 @@
+# PostGIS Spike — Docker Compose
+# Purpose: Validate spatial query patterns for golf course discovery
+# Port 5433 to avoid conflicts with any local PostgreSQL on 5432
+
+version: "3.8"
+
+services:
+  postgis-spike:
+    image: postgis/postgis:16-3.4
+    container_name: golf-postgis-spike
+    ports:
+      - "5433:5432"
+    environment:
+      POSTGRES_DB: golf_spike
+      POSTGRES_USER: spike
+      POSTGRES_PASSWORD: spike_pass
+    volumes:
+      - postgis-spike-data:/var/lib/postgresql/data
+      - ./seed-airports.sql:/docker-entrypoint-initdb.d/01-seed-airports.sql
+      - ./seed-courses.sql:/docker-entrypoint-initdb.d/02-seed-courses.sql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U spike -d golf_spike"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+volumes:
+  postgis-spike-data:

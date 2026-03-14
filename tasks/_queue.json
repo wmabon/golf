@@ -1,0 +1,203 @@
+{
+  "_meta": {
+    "description": "Feature tracking queue. Each slug maps to FR numbers from the PRD.",
+    "statuses": ["backlog", "specced", "in-progress", "review", "done", "blocked"],
+    "updated": "2026-03-14"
+  },
+  "features": [
+    {
+      "slug": "fr-1-5-identity-auth",
+      "title": "Accounts, Profiles, and Membership Access",
+      "frs": ["FR-1", "FR-2", "FR-3", "FR-4", "FR-5"],
+      "service": "identity-and-profile",
+      "milestone": "M1",
+      "priority": "P0",
+      "status": "done",
+      "dependencies": [],
+      "notes": "FR-4 is P1 (admin verification). All others P0."
+    },
+    {
+      "slug": "fr-6-10-trip-creation",
+      "title": "Trip Creation, Collaboration, and Roles",
+      "frs": ["FR-6", "FR-7", "FR-8", "FR-9", "FR-10"],
+      "service": "trip-and-collaboration",
+      "milestone": "M1",
+      "priority": "P0",
+      "status": "done",
+      "dependencies": ["fr-1-5-identity-auth"],
+      "notes": "FR-9 is P1. State machine: Draft->Planning->Voting->Booking->Locked->InProgress->Completed->Archived."
+    },
+    {
+      "slug": "fr-11-16-course-discovery",
+      "title": "Course Discovery, Access Filtering, and Search",
+      "frs": ["FR-11", "FR-12", "FR-13", "FR-14", "FR-15", "FR-16"],
+      "service": "discovery-and-scoring",
+      "milestone": "M1",
+      "priority": "P0",
+      "status": "done",
+      "dependencies": ["fr-1-5-identity-auth"],
+      "notes": "PostGIS required. FR-15, FR-16 are P1. Airport/geocoding integration required."
+    },
+    {
+      "slug": "fr-17-22-course-quality",
+      "title": "Course Quality, Value, and Recommendation Model",
+      "frs": ["FR-17", "FR-18", "FR-19", "FR-20", "FR-21", "FR-22"],
+      "service": "discovery-and-scoring",
+      "milestone": "M1",
+      "priority": "P0",
+      "status": "done",
+      "dependencies": ["fr-11-16-course-discovery"],
+      "notes": "FR-20, FR-21, FR-22 are P1. Community score separate from composite."
+    },
+    {
+      "slug": "fr-23-28-shortlist-voting",
+      "title": "Shortlisting, Decisioning, and Voting",
+      "frs": ["FR-23", "FR-24", "FR-25", "FR-26", "FR-27", "FR-28"],
+      "service": "trip-and-collaboration",
+      "milestone": "M1",
+      "priority": "P0",
+      "status": "done",
+      "dependencies": ["fr-6-10-trip-creation", "fr-11-16-course-discovery"],
+      "notes": "FR-26, FR-28 are P1. Captain override (FR-27) blocked by Open Decision #5."
+    },
+    {
+      "slug": "fr-29-34-booking-engine",
+      "title": "Booking Window Intelligence and Tee-Time Coordination",
+      "frs": ["FR-29", "FR-30", "FR-31", "FR-32", "FR-33", "FR-34"],
+      "service": "booking-orchestration",
+      "milestone": "M2",
+      "priority": "P0",
+      "status": "done",
+      "dependencies": ["fr-23-28-shortlist-voting"],
+      "notes": "All P0. Booking room is real-time. Hybrid execution model. Blocked by aggregator API spike."
+    },
+    {
+      "slug": "fr-35-40-optimization",
+      "title": "Continuous Optimization and Rebooking",
+      "frs": ["FR-35", "FR-36", "FR-37", "FR-38", "FR-39", "FR-40"],
+      "service": "optimization",
+      "milestone": "M3",
+      "priority": "P0",
+      "status": "backlog",
+      "dependencies": ["fr-29-34-booking-engine"],
+      "notes": "FR-38, FR-40 are P1. Swap constraints in Section 8.7.1. Background monitoring job."
+    },
+    {
+      "slug": "fr-41-46-travel-addons",
+      "title": "Optional Lodging and Air Travel",
+      "frs": ["FR-41", "FR-42", "FR-43", "FR-44", "FR-45", "FR-46"],
+      "service": "travel-addon",
+      "milestone": "M5",
+      "priority": "P1",
+      "status": "backlog",
+      "dependencies": ["fr-47-50-itinerary"],
+      "notes": "FR-44 is P0 (link-out + itinerary capture, belongs in M3). FR-46 is P2. Blocked by Open Decision #3."
+    },
+    {
+      "slug": "fr-47-50-itinerary",
+      "title": "Shared Itinerary and Logistics",
+      "frs": ["FR-47", "FR-48", "FR-49", "FR-50"],
+      "service": "trip-and-collaboration",
+      "milestone": "M3",
+      "priority": "P0",
+      "status": "backlog",
+      "dependencies": ["fr-29-34-booking-engine"],
+      "notes": "FR-49, FR-50 are P1. Canonical day-by-day itinerary view."
+    },
+    {
+      "slug": "fr-51-56-rounds-scoring",
+      "title": "In-Round Scoring, Games, and Side Bets",
+      "frs": ["FR-51", "FR-52", "FR-53", "FR-54", "FR-55", "FR-56"],
+      "service": "rounds-games-betting",
+      "milestone": "M4",
+      "priority": "P0",
+      "status": "backlog",
+      "dependencies": ["fr-6-10-trip-creation"],
+      "notes": "FR-55, FR-56 are P1. Game templates blocked by Open Decision #2. Mobile-first score entry."
+    },
+    {
+      "slug": "fr-57-62-photos-microsite",
+      "title": "Trip Photos, Consent, and Shareable Microsites",
+      "frs": ["FR-57", "FR-58", "FR-59", "FR-60", "FR-61", "FR-62"],
+      "service": "media-and-microsite",
+      "milestone": "M4",
+      "priority": "P0",
+      "status": "backlog",
+      "dependencies": ["fr-6-10-trip-creation"],
+      "notes": "FR-59, FR-61, FR-62 are P1. S3/CDN required. PhotoAsset state machine. Privacy-first."
+    },
+    {
+      "slug": "fr-63-66-history-gamification",
+      "title": "History, Rivalries, and Gamification",
+      "frs": ["FR-63", "FR-64", "FR-65", "FR-66"],
+      "service": "rounds-games-betting",
+      "milestone": "M4",
+      "priority": "P0",
+      "status": "backlog",
+      "dependencies": ["fr-51-56-rounds-scoring"],
+      "notes": "FR-63 is P0. FR-64, FR-65 are P1. FR-66 is P2 (badges post-launch)."
+    },
+    {
+      "slug": "fr-67-71-fees-billing",
+      "title": "Fees, Billing, and Revenue Logic",
+      "frs": ["FR-67", "FR-68", "FR-69", "FR-70", "FR-71"],
+      "service": "billing",
+      "milestone": "M2",
+      "priority": "P0",
+      "status": "done",
+      "dependencies": ["fr-29-34-booking-engine"],
+      "notes": "FR-71 is P1. Stripe Connect integration. Blocked by Open Decision #1 (fee schedule)."
+    },
+    {
+      "slug": "fr-72-74-notifications",
+      "title": "Notifications and Communication",
+      "frs": ["FR-72", "FR-73", "FR-74"],
+      "service": "notification",
+      "milestone": "M3",
+      "priority": "P0",
+      "status": "backlog",
+      "dependencies": ["fr-6-10-trip-creation"],
+      "notes": "FR-73 is P1. Activity feed (FR-74) needed early in M1 for trip state logging. Email + SMS providers required."
+    },
+    {
+      "slug": "fr-75-79-admin-ops",
+      "title": "Admin, Editorial, and Concierge Operations",
+      "frs": ["FR-75", "FR-76", "FR-77", "FR-78", "FR-79"],
+      "service": "admin-operations",
+      "milestone": "M2",
+      "priority": "P0",
+      "status": "done",
+      "dependencies": ["fr-29-34-booking-engine"],
+      "notes": "FR-77, FR-78 are P1. Separate internal web console. FR-75/76/79 are P0 launch deps."
+    },
+    {
+      "slug": "fr-80-83-cost-splitting",
+      "title": "Trip Cost Splitting and Reimbursement",
+      "frs": ["FR-80", "FR-81", "FR-82", "FR-83"],
+      "service": "billing",
+      "milestone": "M4",
+      "priority": "P1",
+      "status": "backlog",
+      "dependencies": ["fr-67-71-fees-billing"],
+      "notes": "All P1. Expense ledger + settlement deep links. Non-custodial. Should ship before GA."
+    }
+  ],
+  "spikes": [
+    {
+      "slug": "spike-aggregator-api",
+      "title": "Aggregator API Cart-Hold Investigation",
+      "description": "Test GolfNow/Supreme Golf APIs for hold-endpoint availability, rate limits, multi-hold policies, rollback behavior.",
+      "milestone": "M1",
+      "status": "done",
+      "blocks": ["fr-29-34-booking-engine"]
+    },
+    {
+      "slug": "spike-postgis-setup",
+      "title": "PostGIS Configuration and Spatial Query Patterns",
+      "description": "Set up PostGIS, validate airport/radius queries, drive-time filtering, and geographic ranking.",
+      "milestone": "M1",
+      "status": "done",
+      "blocks": ["fr-11-16-course-discovery"]
+    }
+  ]
+}
