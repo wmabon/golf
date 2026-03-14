@@ -2,40 +2,7 @@ import { auth } from "@/lib/auth";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import ReportForm from "./report-form";
-
-interface CourseDetail {
-  id: string;
-  name: string;
-  city: string | null;
-  state: string | null;
-  lat: number;
-  lng: number;
-  accessType: string;
-  accessConfidence: string;
-  priceBandMin: string | null;
-  priceBandMax: string | null;
-  reasonsToPlay: string | null;
-  websiteUrl: string | null;
-  phone: string | null;
-  amenities: Record<string, boolean> | null;
-  photos: string[] | null;
-  // Booking rules
-  bookingWindowRule: string | null;
-  bookingWindowDays: number | null;
-  cancellationRule: string | null;
-  cancellationDeadlineHours: number | null;
-  maxPlayers: number | null;
-  publicTimesAvailable: boolean | null;
-  ruleSource: string | null;
-  // Quality scores
-  editorialScore: string | null;
-  externalRankScore: string | null;
-  valueScore: string | null;
-  communityAverageScore: string | null;
-  reviewCount: number | null;
-  valueLabel: string | null;
-  tripFitInputs: Record<string, number> | null;
-}
+import * as courseService from "@/services/discovery/course.service";
 
 const ACCESS_BADGES: Record<string, { label: string; className: string }> = {
   public: { label: "Public", className: "bg-green-100 text-green-800" },
@@ -55,16 +22,6 @@ const AMENITY_LABELS: Record<string, string> = {
   walking_allowed: "Walking Allowed",
 };
 
-async function fetchCourse(courseId: string): Promise<CourseDetail | null> {
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-  const res = await fetch(`${baseUrl}/api/courses/${courseId}`, {
-    cache: "no-store",
-  });
-  if (!res.ok) return null;
-  const data = await res.json();
-  return data.course ?? null;
-}
-
 export default async function CourseDetailPage({
   params,
 }: {
@@ -74,7 +31,7 @@ export default async function CourseDetailPage({
   if (!session) redirect("/login");
 
   const { courseId } = await params;
-  const course = await fetchCourse(courseId);
+  const course = await courseService.getCourseById(courseId);
   if (!course) notFound();
 
   const badge = ACCESS_BADGES[course.accessType] ?? ACCESS_BADGES.unknown;

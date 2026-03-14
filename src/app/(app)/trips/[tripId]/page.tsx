@@ -1,6 +1,7 @@
 import { auth } from "@/lib/auth";
 import { redirect } from "next/navigation";
 import Link from "next/link";
+import * as tripService from "@/services/trip/trip.service";
 
 export default async function TripDetailPage({
   params,
@@ -11,24 +12,7 @@ export default async function TripDetailPage({
   if (!session) redirect("/login");
 
   const { tripId } = await params;
-
-  // Fetch trip data from API
-  let trip = null;
-  try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000";
-    const res = await fetch(`${baseUrl}/api/trips/${tripId}`, {
-      headers: {
-        cookie: `next-auth.session-token=${session}`,
-      },
-      cache: "no-store",
-    });
-    if (res.ok) {
-      const data = await res.json();
-      trip = data.trip;
-    }
-  } catch {
-    // Fallback: show basic layout
-  }
+  const trip = await tripService.getTrip(tripId);
 
   return (
     <main className="max-w-4xl mx-auto p-6">
