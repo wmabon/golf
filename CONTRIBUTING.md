@@ -19,7 +19,12 @@ DATABASE_URL=postgresql://golf:golf_dev_password@localhost:5432/golf_dev npx tsx
 DATABASE_URL=postgresql://golf:golf_dev_password@localhost:5432/golf_dev AUTH_SECRET=dev-secret-for-testing pnpm dev
 ```
 
-Verify at http://localhost:3000. Sign in with `demo@golf.test` / `password123`.
+Verify at http://localhost:3000.
+
+**Test accounts** (after seed):
+- `demo@golf.test` / `password123` — regular user
+- `captain@golf.test` / `password123` — regular user (for multi-user testing)
+- `admin@golf.test` / `password123` — admin role (access `/admin` console)
 
 **Note:** `drizzle-kit` does not read `.env.local` — always pass `DATABASE_URL` explicitly for `db:migrate` and `db:seed` commands.
 

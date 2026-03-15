@@ -129,6 +129,15 @@ Test credentials (after seed):
 - API routes are for client-side `fetch()` calls only (from `"use client"` components)
 - Server components have direct database access — no need to round-trip through HTTP
 
+### Admin Console
+- Route group: `src/app/(admin)/` — separate layout from consumer app
+- Layout gate: `src/app/(admin)/layout.tsx` checks auth + systemRole via DB lookup, silently redirects non-admin users to `/dashboard`
+- Admin pages call services directly (same server component pattern)
+- Client components for mutations only: forms call `/api/admin/*` endpoints via fetch
+- Sidebar nav in `src/components/ui/admin-nav.tsx` (slate palette, Trust Posture)
+- Admin API routes at `src/app/api/admin/` use `requireAdmin()` or `requireConcierge()`
+- Pages: `/admin` (dashboard), `/admin/booking-ops` (concierge queue), `/admin/courses` (curation), `/admin/config` (fee schedules, flags)
+
 ### State Machines
 - Files at `src/services/{domain}/state-machine.ts` (or `state-machines/{entity}-sm.ts`)
 - Pattern: `VALID_TRANSITIONS` record → `canTransition(from, to)` → `getNextStates(current)` → `validateTransition(from, to)`

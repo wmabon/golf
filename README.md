@@ -12,7 +12,7 @@ A web app that helps 2-8 golfers plan, book, optimize, play, and memorialize U.S
 | **M4** | On-trip + recap: scoring, games, side bets, photos, microsites | Complete |
 | **M5** | Travel add-ons: optional lodging and air | Complete |
 
-**All milestones complete.** 97 API routes, 933 tests (899 unit + 34 integration), 38 database tables, 7 state machines.
+**All milestones complete.** 103 API routes, 933 tests (899 unit + 34 integration), 38 database tables, 7 state machines.
 
 ## Tech Stack
 

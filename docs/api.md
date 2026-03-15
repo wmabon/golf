@@ -526,6 +526,14 @@ All admin endpoints require the `concierge_ops` or `admin` role.
 | POST | `/api/admin/booking-requests/:requestId/notes` | Concierge | Add internal note |
 | POST | `/api/admin/booking-requests/:requestId/confirmation` | Concierge | Attach tee-time confirmation |
 | PUT | `/api/admin/courses/:courseId/quality-scores` | Admin | Update editorial quality scores |
+| GET | `/api/admin/courses?search=&accessType=&status=` | Concierge | List courses with filters |
+| POST | `/api/admin/courses` | Admin | Create a new course |
+| GET | `/api/admin/courses/:courseId` | Concierge | Get course detail |
+| PUT | `/api/admin/courses/:courseId` | Admin | Update course fields |
+| PUT | `/api/admin/courses/:courseId/access-classification` | Admin | Update access type and confidence |
+| PUT | `/api/admin/courses/:courseId/booking-rules` | Admin | Upsert booking rules |
+| GET | `/api/admin/courses/reports?status=` | Concierge | List course reports |
+| PUT | `/api/admin/courses/reports/:reportId` | Admin | Resolve a course report |
 
 ### PUT /api/admin/booking-requests/:requestId/assign
 
@@ -619,6 +627,189 @@ All admin endpoints require the `concierge_ops` or `admin` role.
 | valueScore | number? | 0-5 |
 | valueLabel | string? | max 100 chars, nullable |
 | tripFitInputs | Record<string, number>? | nullable |
+
+### Course Curation
+
+| Method | Path | Auth | Description |
+|--------|------|------|-------------|
+| GET | `/api/admin/courses?search=&accessType=&status=` | Concierge | List courses with filters |
+| POST | `/api/admin/courses` | Admin | Create a new course |
+| GET | `/api/admin/courses/:courseId` | Concierge | Get course detail |
+| PUT | `/api/admin/courses/:courseId` | Admin | Update course fields |
+| PUT | `/api/admin/courses/:courseId/quality-scores` | Admin | Update editorial quality scores |
+| PUT | `/api/admin/courses/:courseId/access-classification` | Admin | Update access type and confidence |
+| PUT | `/api/admin/courses/:courseId/booking-rules` | Admin | Upsert booking rules |
+| GET | `/api/admin/courses/reports?status=` | Concierge | List course reports |
+| PUT | `/api/admin/courses/reports/:reportId` | Admin | Resolve a course report |
+
+### GET /api/admin/courses
+
+**Query parameters:**
+
+| Param | Type | Rules |
+|-------|------|-------|
+| search | string? | max 255 chars, full-text filter |
+| accessType | enum? | `public` \| `resort` \| `semi_private` \| `private` \| `unknown` |
+| status | enum? | `draft` \| `active` \| `hidden` \| `archived` |
+
+**Response `200`:**
+
+```json
+{ "courses": [ { "id": "uuid", "name": "Pinehurst No. 2", "accessType": "resort", "status": "active", "..." : "..." } ] }
+```
+
+### POST /api/admin/courses
+
+**Request:**
+
+```json
+{
+  "name": "Pinehurst No. 2",
+  "city": "Pinehurst",
+  "state": "NC",
+  "location": { "lat": 35.195, "lng": -79.469 },
+  "accessType": "resort",
+  "accessConfidence": "verified",
+  "priceBandMin": 200,
+  "priceBandMax": 500,
+  "websiteUrl": "https://pinehurst.com",
+  "phone": "+19102357111",
+  "status": "draft"
+}
+```
+
+| Field | Type | Rules |
+|-------|------|-------|
+| name | string | required |
+| city | string? | nullable |
+| state | string? | nullable |
+| location | object? | `{ lat: number, lng: number }` |
+| accessType | string? | default `"unknown"` |
+| accessConfidence | string? | default `"unverified"` |
+| priceBandMin | number? | nullable |
+| priceBandMax | number? | nullable |
+| reasonsToPlay | string? | nullable |
+| websiteUrl | string? | nullable |
+| phone | string? | nullable |
+| status | string? | default `"draft"` |
+
+**Response `201`:**
+
+```json
+{ "course": { "id": "uuid", "name": "Pinehurst No. 2", "status": "draft", "..." : "..." } }
+```
+
+### GET /api/admin/courses/:courseId
+
+**Response `200`:**
+
+```json
+{ "course": { "id": "uuid", "name": "Pinehurst No. 2", "accessType": "resort", "..." : "..." } }
+```
+
+### PUT /api/admin/courses/:courseId
+
+Partial update -- all fields optional. Same fields as `POST /api/admin/courses`.
+
+**Response `200`:**
+
+```json
+{ "course": { "id": "uuid", "name": "Pinehurst No. 2", "..." : "..." } }
+```
+
+### PUT /api/admin/courses/:courseId/access-classification
+
+**Request:**
+
+```json
+{
+  "accessType": "resort",
+  "accessConfidence": "verified"
+}
+```
+
+| Field | Type | Rules |
+|-------|------|-------|
+| accessType | enum | required, `public` \| `resort` \| `semi_private` \| `private` \| `unknown` |
+| accessConfidence | enum | required, `verified` \| `unverified` \| `disputed` |
+
+**Response `200`:**
+
+```json
+{ "course": { "id": "uuid", "accessType": "resort", "accessConfidence": "verified", "..." : "..." } }
+```
+
+### PUT /api/admin/courses/:courseId/booking-rules
+
+**Request:**
+
+```json
+{
+  "bookingWindowDays": 14,
+  "cancellationDeadlineHours": 48,
+  "maxPlayers": 4,
+  "bookingChannel": "phone",
+  "rulesConfirmed": true,
+  "publicTimesAvailable": true,
+  "bookingWindowRule": "Tee times open 14 days in advance at 7am ET",
+  "cancellationRule": "Cancel 48 hours in advance for full refund",
+  "cancellationPenaltyAmount": 50,
+  "notes": "Pro shop prefers phone reservations for groups of 4+",
+  "source": "pro_shop_call"
+}
+```
+
+| Field | Type | Rules |
+|-------|------|-------|
+| bookingWindowDays | integer? | >= 0 |
+| cancellationDeadlineHours | integer? | >= 0 |
+| maxPlayers | integer? | 1-8 |
+| bookingChannel | string? | max 50 chars |
+| rulesConfirmed | boolean? | |
+| publicTimesAvailable | boolean? | |
+| bookingWindowRule | string? | max 500 chars |
+| cancellationRule | string? | max 500 chars |
+| cancellationPenaltyAmount | number? | >= 0 |
+| notes | string? | max 2000 chars |
+| source | string? | max 50 chars |
+
+**Response `200`:**
+
+```json
+{ "rules": { "courseId": "uuid", "bookingWindowDays": 14, "maxPlayers": 4, "rulesConfirmed": true, "..." : "..." } }
+```
+
+### GET /api/admin/courses/reports
+
+**Query parameters:**
+
+| Param | Type | Rules |
+|-------|------|-------|
+| status | string? | filter by report status |
+
+**Response `200`:**
+
+```json
+{ "reports": [ { "id": "uuid", "courseId": "uuid", "status": "pending", "..." : "..." } ] }
+```
+
+### PUT /api/admin/courses/reports/:reportId
+
+**Request:**
+
+```json
+{ "status": "resolved" }
+```
+
+| Field | Type | Rules |
+|-------|------|-------|
+| status | enum | required, `reviewed` \| `resolved` \| `dismissed` |
+
+**Response `200`:**
+
+```json
+{ "report": { "id": "uuid", "courseId": "uuid", "status": "resolved", "resolvedBy": "uuid", "..." : "..." } }
+```
 
 ---
 
